@@ -59,7 +59,18 @@
     .modal__actions { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
     .btn { border: 0; border-radius: 10px; padding: .9rem 1.1rem; font-weight: 700; cursor: pointer; color: #fff; background: var(--boton-fondo); transition: transform .15s ease, background .2s ease; min-height: 44px; touch-action: manipulation; }
     .btn:hover { background: var(--boton-hover); transform: translateY(-2px); }
-    .btn--ghost { background: transparent; color: inherit; border: 2px solid #0003; }
+    /* Botón ghost con alto contraste (legible sobre cielo pastel) */
+.btn--ghost {
+  background: rgba(255,255,255,.88);
+  color: #1f2937;
+  border: 1px solid rgba(0,0,0,.15);
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+.btn--ghost:hover { background: #fff; border-color: rgba(0,0,0,.25); }
+.btn--ghost:active { transform: translateY(0); }
+.btn--ghost:focus-visible { outline: 3px solid color-mix(in srgb, #2563eb 45%, transparent); outline-offset: 2px; }
+.theme-night .btn--ghost { background: rgba(28,32,45,.75); color: #eaeaea; border-color: rgba(255,255,255,.15); box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.theme-night .btn--ghost:hover { background: rgba(36,42,58,.9); border-color: rgba(255,255,255,.25); }
 
     /* Botón de cerrar (X) */
     .modal__close { position: absolute; top: .5rem; right: .5rem; background: transparent; border: none; font-size: 1.25rem; font-weight: 900; color: #444; cursor: pointer; line-height: 1; }
@@ -104,7 +115,57 @@
 }
 
     /* Toolbar: respeta la home bar y el notch */
-    .toolbar { position: fixed; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); display: flex; gap: .5rem; z-index: 20; flex-wrap: wrap; }
+    /* Dock inferior con glassmorphism para dar contraste a los botones */
+.toolbar {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  display: flex; gap: .4rem; flex-wrap: nowrap; justify-content: center; align-items: center; z-index: 20;
+  background: rgba(255,255,255,.35);
+  border: 1px solid rgba(0,0,0,.08);
+  padding: .4rem .5rem; border-radius: 14px;
+  backdrop-filter: saturate(160%) blur(8px);
+  -webkit-backdrop-filter: saturate(160%) blur(8px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.12);
+}
+.toolbar .btn{ padding: .6rem .8rem; font-size: .9rem; min-height: 36px; }
+.theme-night .toolbar{
+  background: rgba(15,18,28,.35);
+  border-color: rgba(255,255,255,.08);
+  box-shadow: 0 8px 22px rgba(0,0,0,.45);
+}
+
+/* Botón icono (sonido) arriba a la derecha */
+.icon-btn {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 22;
+  width: 44px; height: 44px;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(0,0,0,.15);
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 6px 16px rgba(0,0,0,.15);
+  font-size: 1.05rem; cursor: pointer;
+  backdrop-filter: saturate(160%) blur(6px);
+  -webkit-backdrop-filter: saturate(160%) blur(6px);
+}
+.icon-btn:hover{ background:#fff; }
+.theme-night .icon-btn{ background: rgba(28,32,45,.78); color:#eaeaea; border-color: rgba(255,255,255,.18); box-shadow: 0 6px 20px rgba(0,0,0,.45);}
+@media (max-width: 430px) and (min-height: 700px){
+  .toolbar{ left: 50%; right: auto; transform: translateX(-50%); bottom: max(.75rem, env(safe-area-inset-bottom)); gap: .3rem; padding: .35rem .45rem; flex-wrap: nowrap; }
+  .toolbar .btn{ padding: .55rem .75rem; font-size: .9rem; min-height: 34px; }
+}
+  .toolbar .btn{ padding: .8rem 1rem; font-size: .95rem; }
+}
+@media (max-height: 480px){
+  .toolbar{ padding: .3rem .4rem; gap: .25rem; flex-wrap: nowrap; }
+  .toolbar .btn{ padding: .5rem .7rem; font-size: .85rem; min-height: 32px; }
+}
+  .toolbar .btn{ padding: .7rem .9rem; font-size: .9rem; }
+}
 
     @media (prefers-reduced-motion: reduce) { body { animation: none; } .stem { animation: none; } .phrase-container { transition: none; } }
 
@@ -153,8 +214,10 @@
     <button class="btn btn--ghost" id="change-mood" title="Cambiar estado">Cambiar estado</button>
     <button class="btn btn--ghost" id="pause-anim" title="Pausar animación">Pausar</button>
     <button class="btn btn--ghost" id="toggle-theme" title="Cambiar tema">Modo noche</button>
-    <button class="btn btn--ghost" id="toggle-audio" title="Activar/Desactivar sonido">🔈 Sonido</button>
   </div>
+  
+  <!-- Icono de sonido arriba a la derecha -->
+  <button class="icon-btn sound-btn" id="toggle-audio" title="Activar/Desactivar sonido" aria-label="Activar/Desactivar sonido">🔈</button>
 
   <script>
     // ===== Paletas por flor (se barajan en cada render) =====
@@ -403,7 +466,14 @@
     applyTheme(store.get('themeNight', false));
     $('#toggle-theme').addEventListener('click', ()=> applyTheme(!document.body.classList.contains('theme-night')));
 
-    function refreshAudioBtn(){ $('#toggle-audio').textContent = (audioOn ? '🔈 Sonido' : '🔇 Silencio'); }
+    function refreshAudioBtn(){
+      const b = $('#toggle-audio');
+      if(!b) return;
+      const on = audioOn;
+      b.textContent = on ? '🔈' : '🔇';
+      b.setAttribute('aria-label', on ? 'Desactivar sonido' : 'Activar sonido');
+      b.title = on ? 'Desactivar sonido' : 'Activar sonido';
+    }
     refreshAudioBtn();
     $('#toggle-audio').addEventListener('click', ()=>{ audioOn=!audioOn; store.set('audioOn', audioOn); refreshAudioBtn(); });
 
