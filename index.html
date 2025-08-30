@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <!-- Hacemos el viewport compatible con iPhone (notch) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Ramo de Gerberas</title>
+  <style>
+    :root {
+      /* Cielo (tema día) */
+      --cielo-claro: #87CEEB;
+      --cielo-horizonte: #E0F6FF;
+      /* Cielo (tema noche) */
+      --cielo-noche-1:#0b1b2b; --cielo-noche-2:#132c45;
+
+      --tallo-oscuro: #2d5a27;
+      --tallo-claro: #3c7a34;
+      --centro-flor: #4b2e1e;
+      --centro-flor-sombra: #2e1b11;
+      --texto-principal: #333;
+      --boton-fondo: #4a3520;
+      --boton-hover: #6b4e3a;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 16px; }
+    body {
+      min-height: 100svh; /* estable en iOS Safari */
+      display: grid;
+      place-items: end center;
+      background: linear-gradient(var(--cielo-claro), var(--cielo-horizonte));
+      background-size: 100% 200%;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--texto-principal);
+      overflow: hidden;
+      animation: skyShift 24s ease-in-out infinite alternate;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Tema noche */
+    .theme-night {
+      --texto-principal:#eaeaea;
+      --boton-fondo:#2b2b35; --boton-hover:#3b3b47;
+      background: linear-gradient(var(--cielo-noche-1), var(--cielo-noche-2));
+      animation-duration: 36s;
+    }
+
+    @keyframes skyShift { 0% { background-position: 0% 0%; } 100%{ background-position: 0% 100%; } }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; display: grid; place-items: center; background: color-mix(in srgb, #000 20%, transparent); z-index: 1000; }
+    .modal[hidden] { display: none; }
+    .modal__panel { position: relative; background: #fff; color:#222; width: min(92vw, 420px); padding: 1.5rem; border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,.25); margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    .modal__title { font-size: 1.25rem; margin: 0 2rem 1rem; text-align: center; }
+    .modal__actions { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
+    .btn { border: 0; border-radius: 10px; padding: .9rem 1.1rem; font-weight: 700; cursor: pointer; color: #fff; background: var(--boton-fondo); transition: transform .15s ease, background .2s ease; min-height: 44px; touch-action: manipulation; }
+    .btn:hover { background: var(--boton-hover); transform: translateY(-2px); }
+    .btn--ghost { background: transparent; color: inherit; border: 2px solid #0003; }
+
+    /* Botón de cerrar (X) */
+    .modal__close { position: absolute; top: .5rem; right: .5rem; background: transparent; border: none; font-size: 1.25rem; font-weight: 900; color: #444; cursor: pointer; line-height: 1; }
+    .modal__close:hover { color: #000; }
+
+    /* Frases */
+    .phrase-container { position: fixed; top: var(--phrase-top, 18%); left: 50%; translate: -50% -50%; width: min(92vw, 820px); text-align: center; font-size: clamp(1.05rem, 3.5vw + .35rem, 2.2rem); font-weight: 700; text-wrap: balance; opacity: 0; transition: opacity 800ms ease; z-index: 5; text-shadow: 1px 1px 3px rgba(255,255,255,.5); padding: 0 .5rem; }
+    .phrase-container[aria-hidden="false"] { opacity: 1; }
+
+    /* Ramo */
+    .bouquet { position: relative; width: 100%; height: 100%; opacity: 0; transform: translateZ(0) scale(var(--bouquet-scale,1)); transform-origin: center bottom; will-change: transform; transition: opacity .9s ease, transform .35s ease; }
+    .bouquet.is-visible { opacity: 1; }
+
+    .stem { --h: 14rem; --x: 0%; --dur: 5s; position: absolute; bottom: 0; left: 50%; translate: var(--x) 0; width: .3rem; height: var(--h); background: linear-gradient(to right, var(--tallo-oscuro), var(--tallo-claro)); border-radius: 6px; transform-origin: bottom; animation: sway var(--dur) ease-in-out infinite alternate; z-index: 1; }
+
+    @keyframes sway { from { rotate: -8deg; } to { rotate: 8deg; } }
+
+    .flower { position: absolute; top: -5rem; left: -3rem; z-index: 2; }
+    .ring { position: relative; width: calc(var(--R) * 2); height: calc(var(--R) * 2); }
+
+    .petal-wrap { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform: translate(-50%, -50%) rotate(var(--angle)); }
+    .petal { width: var(--w); height: var(--l); border-radius: 50% 50% 45% 45% / 55% 55% 45% 45%; transform-origin: 50% 100%; transform: translateY(calc(-1 * var(--R))); filter: drop-shadow(0 1px 1px rgba(0,0,0,.15)); }
+
+    .center { position: absolute; top: 50%; left: 50%; width: var(--core, 1.8rem); height: var(--core, 1.8rem); transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(ellipse at 40% 35%, var(--centro-flor), var(--centro-flor-sombra)); box-shadow: inset 0 2px 3px rgba(0,0,0,.25); }
+    .ring::after { content: none; }
+
+/* Sutileza en modo noche: un halo muy tenue */
+.theme-night .ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 .08rem rgba(255,255,255,.06);
+}
+
+    /* Toolbar: respeta la home bar y el notch */
+    .toolbar { position: fixed; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); display: flex; gap: .5rem; z-index: 20; flex-wrap: wrap; }
+
+    @media (prefers-reduced-motion: reduce) { body { animation: none; } .stem { animation: none; } .phrase-container { transition: none; } }
+
+    /* ============================ */
+    /*     iPhone 11 - Retrato      */
+    /*  (ancho lógico ~414px)       */
+    /* ============================ */
+    @media (max-width: 430px) and (min-height: 700px) {
+      .phrase-container { top: calc(env(safe-area-inset-top) + 16vh); font-size: clamp(1rem, 4.5vw + .25rem, 1.6rem); }
+      .modal__panel { width: min(92vw, 360px); }
+      .btn { padding: .9rem 1rem; }
+      .stem { width: .28rem; }
+      .flower { top: -4.2rem; left: -2.6rem; transform: scale(.9); transform-origin: center bottom; }
+    }
+
+    /* ============================ */
+    /*     iPhone 11 - Apaisado     */
+    /* ============================ */
+    @media (max-height: 480px) {
+      body { place-items: center; }
+      .phrase-container { top: calc(env(safe-area-inset-top) + 12vh); font-size: clamp(.95rem, 3.8vw + .2rem, 1.4rem); }
+      .stem { --h: 12rem; }
+      .flower { transform: scale(.8); transform-origin: center bottom; top: -3.6rem; left: -2.2rem; }
+      .toolbar { gap: .4rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="modal" id="mood-modal" role="dialog" aria-modal="true" aria-labelledby="mood-title">
+    <div class="modal__panel">
+      <button class="modal__close" id="close-modal" aria-label="Cerrar">✕</button>
+      <h2 id="mood-title" class="modal__title">¿Cómo te sientes hoy?</h2>
+      <div class="modal__actions">
+        <button class="btn" data-mood="feliz" id="btn-feliz">😊 Feliz</button>
+        <button class="btn" data-mood="triste">💙 Triste</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="phrase" class="phrase-container" role="status" aria-live="polite" aria-hidden="true"></div>
+  <div id="bouquet" class="bouquet" aria-hidden="true"></div>
+
+  <div class="toolbar" aria-label="Herramientas">
+    <button class="btn btn--ghost" id="change-mood" title="Cambiar estado">Cambiar estado</button>
+    <button class="btn btn--ghost" id="pause-anim" title="Pausar animación">Pausar</button>
+    <button class="btn btn--ghost" id="toggle-theme" title="Cambiar tema">Modo noche</button>
+    <button class="btn btn--ghost" id="toggle-audio" title="Activar/Desactivar sonido">🔈 Sonido</button>
+  </div>
+
+  <script>
+    // ===== Paletas por flor (se barajan en cada render) =====
+    // ===== Paleta 'solo pastel' realista (gerberas) =====
+    const TONES = [
+      {h:50, s:60, l:76},  // amarillo suave
+      {h:42, s:55, l:78},  // ámbar pastel
+      {h:30, s:55, l:78},  // melocotón
+      {h:18, s:55, l:76},  // salmón
+      {h:10, s:55, l:74},  // coral
+      {h:2,  s:52, l:72},  // rojo suave
+      {h:345,s:50, l:76},  // rosa fuerte suavizado
+      {h:330,s:45, l:80},  // rosa pastel
+      {h:45, s:30, l:88}   // crema
+    ];
+    const hsl = (h,s,l)=>`hsl(${h} ${s}% ${l}%)`;
+    const jitter = (v, spread)=> v + (Math.random()*2-1)*spread;
+    function makePastelGradient(tone){
+      const s1 = Math.max(25, Math.min(70, jitter(tone.s, 4)));
+      const s2 = Math.max(25, Math.min(70, s1 - 6));
+      const l1 = Math.max(60, Math.min(90, jitter(tone.l, 3)));
+      const l2 = Math.max(65, Math.min(95, l1 + 6));
+      return { a: hsl(tone.h, s1, l1), b: hsl(tone.h, s2, l2) };
+    }
+    function buildPastelPalette(n){
+      const tones = shuffle(TONES).slice(0, n);
+      return tones.map(makePastelGradient);
+    }
+
+    // ===== Frases (con más contenido y la especial en ambas) =====
+    const PHRASES = {
+      feliz: [
+        'Te quiero mucho mi niña <3',
+        '💖 "Me encanta verte feliz, pero lo que más me gusta es saber que una persona tan increíble como tú merece toda esa felicidad y más."',
+        '🌟 "Tu energía ilumina todo a tu alrededor. No solo eres increíble, sino que haces que todo sea mejor con tu presencia."',
+        '😊 "Si la felicidad tuviera un rostro, seguramente se parecería mucho al tuyo. ¡Brillas con luz propia!"',
+        '✨ "Eres de esas personas que le dan color a la vida de los demás."',
+        '💫 "Ojalá pudieras verte con mis ojos: eres extraordinaria."',
+        '🔥 "Mereces una felicidad que no termine nunca."',
+        '🥰 "Tu sonrisa mejora el mundo."',
+        '🌼 "Tu alegría es contagiosa y preciosa."',
+        '🌈 "Cada día contigo se siente más bonito."',
+        '🌻 "Gracias por existir, luz bonita."',
+        '💛 "Hoy te abrazo fuerte con mi pensamiento."'
+      ],
+      triste: [
+        'Te quiero mucho mi niña <3',
+        '💙 "No tienes que ser fuerte todo el tiempo. Estoy aquí para ti."',
+        '🤍 "No cargues sola: déjame ayudarte."',
+        '✨ "Tu valor no depende de cómo te sientas hoy."',
+        '💫 "Las tormentas pasan, el sol vuelve."',
+        '🥰 "No estás sola; cuentas conmigo siempre."',
+        '🌿 "Está bien sentir; también es parte de sanar."',
+        '🔥 "Incluso en días grises, sigues brillando."',
+        '🌙 "Respira profundo: un paso a la vez."',
+        '🕊️ "Eres más fuerte de lo que crees."',
+        '🤗 "Te abrazo con todo mi cariño."',
+        '💛 "Aquí estoy, contigo."'
+      ]
+    };
+
+    // ===== Utilidades =====
+    const $ = (s,el=document)=>el.querySelector(s);
+    const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
+    const shuffle = a => Array.isArray(a) ? a.slice().sort(()=>Math.random()-.5) : [];
+    const store = { get: (k,def)=>{ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch{ return def; } }, set: (k,v)=>{ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} } };
+
+    // ===== Estado =====
+    let mood = store.get('mood', null);
+    let phrases = [];
+    let phraseIdx = 0;
+    let timer = null;
+    let paused = false;
+    let audioOn = store.get('audioOn', true);
+
+    // ===== Audio =====
+    let actx = null;
+    function playChime() { if (!audioOn) return; if (!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); const t0 = actx.currentTime; const o = actx.createOscillator(); const g = actx.createGain(); o.type='sine'; o.frequency.setValueAtTime(660, t0); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.08, t0+0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0+0.5); o.connect(g).connect(actx.destination); o.start(t0); o.stop(t0+0.52); }
+
+    // ===== Elementos =====
+    const modal = $('#mood-modal');
+    const phraseEl = $('#phrase');
+    const bouquet = $('#bouquet');
+    const btnPause = $('#pause-anim');
+    const btnChange = $('#change-mood');
+    const btnTheme = $('#toggle-theme');
+    const btnAudio = $('#toggle-audio');
+    const btnClose = $('#close-modal');
+
+    // ===== Gerbera =====
+    function createGerbera(color,{ R = '3.2rem', outer = 28, inner = 28, w = '0.55rem', l = '3.2rem', lInner = '2.4rem' } = {}) {
+      const flower = document.createElement('div');
+      flower.className = 'flower';
+      const ring = document.createElement('div');
+      ring.className = 'ring';
+      ring.style.setProperty('--R', R);
+      for (let i = 0; i < outer; i++) {
+        const wrap = document.createElement('div');
+        wrap.className = 'petal-wrap';
+        wrap.style.setProperty('--angle', `${(360 / outer) * i}deg`);
+        const p = document.createElement('div');
+        p.className = 'petal';
+        p.style.setProperty('--w', w);
+        p.style.setProperty('--l', l);
+        p.style.setProperty('--R', R);
+        p.style.background = `linear-gradient(${color.a}, ${color.b})`;
+        wrap.appendChild(p);
+        ring.appendChild(wrap);
+      }
+      for (let i = 0; i < inner; i++) {
+        const wrap = document.createElement('div');
+        wrap.className = 'petal-wrap';
+        wrap.style.setProperty('--angle', `${(360 / inner) * i + (180 / inner)}deg`);
+        const p = document.createElement('div');
+        p.className = 'petal';
+        p.style.setProperty('--w', '0.5rem');
+        p.style.setProperty('--l', lInner);
+        p.style.setProperty('--R', `calc(${R} - 0.35rem)`);
+        p.style.background = `linear-gradient(${color.a}, ${color.b})`;
+        wrap.appendChild(p);
+        ring.appendChild(wrap);
+      }
+      const center = document.createElement('div');
+      center.className = 'center';
+      center.style.setProperty('--core', '1.6rem');
+      ring.appendChild(center);
+      flower.appendChild(ring);
+      return flower;
+    }
+
+    const stems = [
+      { h: '18rem', x: '-60%', dur: '5s' },
+      { h: '16rem', x: '-20%', dur: '4s' },
+      { h: '17rem', x: '30%', dur: '6s' },
+      { h: '15rem', x: '70%', dur: '3.5s' },
+    ];
+
+    function renderBouquet() {
+      bouquet.replaceChildren();
+      // Colores aleatorios en cada render
+      const colors = buildPastelPalette(stems.length);
+      stems.forEach(({ h, x, dur }, i) => {
+        const s = document.createElement('div');
+        s.className = 'stem';
+        s.style.setProperty('--h', h);
+        s.style.setProperty('--x', x);
+        s.style.setProperty('--dur', dur);
+        const color = colors[i % colors.length];
+        s.appendChild(createGerbera(color));
+        bouquet.appendChild(s);
+      });
+    }
+    // ===== Layout auto-escala y posición de frase =====
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+    function fitLayout(){
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const scale = clamp(vh / 820, 0.8, 1.25);
+      bouquet.style.setProperty('--bouquet-scale', scale.toFixed(3));
+      const topVh = clamp(14 + (vh - 700) * (8/300), 12, 22);
+      phraseEl.style.top = `calc(env(safe-area-inset-top) + ${topVh}vh)`;
+    }
+    window.addEventListener('resize', fitLayout, { passive: true });
+    window.addEventListener('orientationchange', fitLayout);
+
+    // ===== Frases =====
+    function cyclePhrase() {
+      if (!phrases.length) return;
+      phraseEl.setAttribute('aria-hidden', 'false');
+      phraseEl.textContent = phrases[phraseIdx];
+      playChime();
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        phraseEl.setAttribute('aria-hidden', 'true');
+        phraseIdx = (phraseIdx + 1) % phrases.length;
+        timer = setTimeout(cyclePhrase, 1000);
+      }, 5000);
+    }
+
+    // ===== Estado de ánimo =====
+    function setMood(next) {
+      mood = next; store.set('mood', mood);
+      phrases = shuffle(PHRASES[mood]); phraseIdx = 0;
+      renderBouquet(); bouquet.classList.add('is-visible'); bouquet.setAttribute('aria-hidden', 'false');
+      closeModal(); cyclePhrase(); playChime(); fitLayout();
+    }
+
+    // ===== Modal =====
+    function openModal(){ modal.hidden = false; $('#btn-feliz').focus(); }
+    function closeModal(){ modal.hidden = true; }
+    btnClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', e=>{ if(e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e=>{ if(!modal.hidden && e.key==='Escape') closeModal(); });
+
+    // Click en Feliz/Triste
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-mood]');
+      if (btn) setMood(btn.dataset.mood);
+    });
+
+    // ===== Toolbar =====
+    $('#change-mood').addEventListener('click', openModal);
+    $('#pause-anim').addEventListener('click', () => {
+      paused = !paused;
+      const state = paused ? 'paused' : 'running';
+      bouquet.style.animationPlayState = state;
+      $$('.stem', bouquet).forEach(s => s.style.animationPlayState = state);
+      $('#pause-anim').textContent = paused ? 'Reanudar' : 'Pausar';
+    });
+
+    function applyTheme(night){
+      document.body.classList.toggle('theme-night', night);
+      $('#toggle-theme').textContent = night ? 'Modo día' : 'Modo noche';
+      store.set('themeNight', night);
+    }
+    applyTheme(store.get('themeNight', false));
+    $('#toggle-theme').addEventListener('click', ()=> applyTheme(!document.body.classList.contains('theme-night')));
+
+    function refreshAudioBtn(){ $('#toggle-audio').textContent = (audioOn ? '🔈 Sonido' : '🔇 Silencio'); }
+    refreshAudioBtn();
+    $('#toggle-audio').addEventListener('click', ()=>{ audioOn=!audioOn; store.set('audioOn', audioOn); refreshAudioBtn(); });
+
+    // ===== Inicio =====
+    if (mood) { setMood(mood); } else { openModal(); }
+    fitLayout();
+  </script>
+</body>
+</html>
