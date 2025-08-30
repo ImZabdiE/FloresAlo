@@ -49,8 +49,11 @@
     @keyframes skyShift { 0% { background-position: 0% 0%; } 100%{ background-position: 0% 100%; } }
 
     /* Modal */
-    .modal { position: fixed; inset: 0; display: grid; place-items: center; /* fallback para Safari antiguo */ background: rgba(0,0,0,.2); /* intentamos usar color-mix si existe */ background: color-mix(in srgb, #000 20%, transparent); z-index: 1000; }
+    .modal { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.2); z-index: 1000; }
     .modal[hidden] { display: none; }
+@supports (background: color-mix(in srgb, #000 20%, transparent)) {
+  .modal { background: color-mix(in srgb, #000 20%, transparent); }
+}
     .modal__panel { position: relative; background: #fff; color:#222; width: min(92vw, 420px); padding: 1.5rem; border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,.25); margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
     .modal__title { font-size: 1.25rem; margin: 0 2rem 1rem; text-align: center; }
     .modal__actions { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
@@ -64,24 +67,25 @@
 
     /* Frases */
     .phrase-container { position: fixed; top: var(--phrase-top, 18%); left: 50%;
-    transform: translate(-50%, -50%); /* fallback muy compatible */ width: min(92vw, 820px); text-align: center; font-size: clamp(1.05rem, 3.5vw + .35rem, 2.2rem); font-weight: 700; text-wrap: balance; opacity: 0; transition: opacity 800ms ease; z-index: 5; text-shadow: 1px 1px 3px rgba(255,255,255,.5); padding: 0 .5rem; }
+    transform: translate(-50%, -50%); /* fallback muy compatible */ width: min(92vw, 820px); text-align: center; font-size: clamp(1.05rem, 3.5vw + .35rem, 2.2rem); font-weight: 700; overflow-wrap: anywhere; opacity: 0; transition: opacity 800ms ease; z-index: 5; text-shadow: 1px 1px 3px rgba(255,255,255,.5); padding: 0 .5rem; }
     .phrase-container[aria-hidden="false"] { opacity: 1; }
+@supports (text-wrap: balance) {
+  .phrase-container { text-wrap: balance; }
+}
 
     /* Ramo */
     .bouquet { position: relative; width: 100%; height: 100%; opacity: 0; transform: translateZ(0) scale(var(--bouquet-scale,1)); transform-origin: center bottom; will-change: transform; transition: opacity .9s ease, transform .35s ease; }
     .bouquet.is-visible { opacity: 1; }
 
-    .stem { --h: 14rem; --x: 0%; --dur: 5s; position: absolute; bottom: 0; left: calc(50% + var(--x)); width: .3rem; height: var(--h); background: linear-gradient(to right, var(--tallo-oscuro), var(--tallo-claro)); border-radius: 6px; transform-origin: bottom; animation: sway var(--dur) ease-in-out infinite alternate; z-index: 1; }
+    .stem { --h: 14rem; --x: 0rem; --dur: 5s; position: absolute; bottom: 0; left: 50%; width: .3rem; height: var(--h); background: linear-gradient(to right, var(--tallo-oscuro), var(--tallo-claro)); border-radius: 6px; transform-origin: bottom; animation: sway var(--dur) ease-in-out infinite alternate; z-index: 1; }
 
-    @keyframes sway { from { rotate: -8deg; } to { rotate: 8deg; } }
+    @keyframes sway { from { transform: translateX(var(--x)) rotate(-8deg); } to { transform: translateX(var(--x)) rotate(8deg); } }
 
-    /* Fallback para Safari que no soporta propiedades individuales de transform */
-    @supports not (rotate: 1deg) {
-      @keyframes sway_legacy { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
-      .stem { animation-name: sway_legacy; }
-    } to { rotate: 8deg; } }
+    
 
-    .flower { position: absolute; top: -5rem; left: -3rem; z-index: 2; }
+
+    /* limpiado: bloque duplicado de fallback eliminado */
+.flower { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); transform-origin: center bottom; z-index: 2; }
     .ring { position: relative; width: calc(var(--R) * 2); height: calc(var(--R) * 2); }
 
     .petal-wrap { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform: translate(-50%, -50%) rotate(var(--angle)); }
@@ -110,10 +114,11 @@
     /* ============================ */
     @media (max-width: 430px) and (min-height: 700px) {
       .phrase-container { top: calc(env(safe-area-inset-top) + 16vh); font-size: clamp(1rem, 4.5vw + .25rem, 1.6rem); }
+
       .modal__panel { width: min(92vw, 360px); }
       .btn { padding: .9rem 1rem; }
       .stem { width: .28rem; }
-      .flower { top: -4.2rem; left: -2.6rem; transform: scale(.9); transform-origin: center bottom; }
+      .flower { transform: translate(-50%, -50%) scale(.9); transform-origin: center bottom; }
     }
 
     /* ============================ */
@@ -121,9 +126,10 @@
     /* ============================ */
     @media (max-height: 480px) {
       body { place-items: center; }
+
       .phrase-container { top: calc(env(safe-area-inset-top) + 12vh); font-size: clamp(.95rem, 3.8vw + .2rem, 1.4rem); }
       .stem { --h: 12rem; }
-      .flower { transform: scale(.8); transform-origin: center bottom; top: -3.6rem; left: -2.2rem; }
+      .flower { transform: translate(-50%, -50%) scale(.8); transform-origin: center bottom; }
       .toolbar { gap: .4rem; }
     }
   </style>
@@ -261,6 +267,8 @@
       const ring = document.createElement('div');
       ring.className = 'ring';
       ring.style.setProperty('--R', R);
+      // Aseguramos que --R esté también en .flower para cálculos de posicionamiento
+      flower.style.setProperty('--R', R);
       for (let i = 0; i < outer; i++) {
         const wrap = document.createElement('div');
         wrap.className = 'petal-wrap';
@@ -295,16 +303,28 @@
       return flower;
     }
 
-    const stems = [
-      { h: '18rem', x: '-60%', dur: '5s' },
-      { h: '16rem', x: '-20%', dur: '4s' },
-      { h: '17rem', x: '30%', dur: '6s' },
-      { h: '15rem', x: '70%', dur: '3.5s' },
-    ];
-
+    // === Configuración del ramo ===
+    const STEM_COUNT = 15; // número de flores
+    const BOUQUET_SPREAD = 1.6; // >1 más abierto, <1 más compacto
+    function generateStems(n){
+      const stems = [];
+      const R_BASE = 3.4;
+      const Rmax = R_BASE * BOUQUET_SPREAD;
+      for(let i=0;i<n;i++){
+        const angle = i * 137.508;
+        const t = (i+1)/n;
+        const radius = Math.pow(t, 0.55) * Rmax * (0.9 + Math.random()*0.6);
+        const x = (Math.sin(angle * Math.PI/180) * radius).toFixed(2) + 'rem';
+        const h = (14 + Math.random()*6).toFixed(2) + 'rem';
+        const dur = (3.5 + Math.random()*3).toFixed(2) + 's';
+        stems.push({h, x, dur});
+      }
+      stems.sort((a,b)=> parseFloat(b.h) - parseFloat(a.h));
+      return stems;
+    }
     function renderBouquet() {
       bouquet.replaceChildren();
-      // Colores aleatorios en cada render
+      const stems = generateStems(STEM_COUNT);
       const colors = buildPastelPalette(stems.length);
       stems.forEach(({ h, x, dur }, i) => {
         const s = document.createElement('div');
@@ -313,7 +333,8 @@
         s.style.setProperty('--x', x);
         s.style.setProperty('--dur', dur);
         const color = colors[i % colors.length];
-        s.appendChild(createGerbera(color));
+        // Gerbera ligeramente más compacta para 15 flores
+        s.appendChild(createGerbera(color, { R: '2.8rem', outer: 28, inner: 26, w: '0.5rem', l: '2.85rem', lInner: '2.1rem' }));
         bouquet.appendChild(s);
       });
     }
