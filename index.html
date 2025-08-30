@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <!-- Hacemos el viewport compatible con iPhone (notch) -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Te amo</title>
+  <title>Ramo de Gerberas</title>
   <style>
     :root {
       /* Cielo (tema día) */
@@ -25,7 +25,8 @@
     * { box-sizing: border-box; margin: 0; }
     html { font-size: 16px; }
     body {
-      min-height: 100svh; /* estable en iOS Safari */
+      min-height: 100vh; /* fallback amplio */
+      min-height: 100svh; /* iOS moderno: evita saltos al mostrar barra */ /* estable en iOS Safari */
       display: grid;
       place-items: end center;
       background: linear-gradient(var(--cielo-claro), var(--cielo-horizonte));
@@ -48,7 +49,7 @@
     @keyframes skyShift { 0% { background-position: 0% 0%; } 100%{ background-position: 0% 100%; } }
 
     /* Modal */
-    .modal { position: fixed; inset: 0; display: grid; place-items: center; background: color-mix(in srgb, #000 20%, transparent); z-index: 1000; }
+    .modal { position: fixed; inset: 0; display: grid; place-items: center; /* fallback para Safari antiguo */ background: rgba(0,0,0,.2); /* intentamos usar color-mix si existe */ background: color-mix(in srgb, #000 20%, transparent); z-index: 1000; }
     .modal[hidden] { display: none; }
     .modal__panel { position: relative; background: #fff; color:#222; width: min(92vw, 420px); padding: 1.5rem; border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,.25); margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
     .modal__title { font-size: 1.25rem; margin: 0 2rem 1rem; text-align: center; }
@@ -62,16 +63,23 @@
     .modal__close:hover { color: #000; }
 
     /* Frases */
-    .phrase-container { position: fixed; top: var(--phrase-top, 18%); left: 50%; translate: -50% -50%; width: min(92vw, 820px); text-align: center; font-size: clamp(1.05rem, 3.5vw + .35rem, 2.2rem); font-weight: 700; text-wrap: balance; opacity: 0; transition: opacity 800ms ease; z-index: 5; text-shadow: 1px 1px 3px rgba(255,255,255,.5); padding: 0 .5rem; }
+    .phrase-container { position: fixed; top: var(--phrase-top, 18%); left: 50%;
+    transform: translate(-50%, -50%); /* fallback muy compatible */ width: min(92vw, 820px); text-align: center; font-size: clamp(1.05rem, 3.5vw + .35rem, 2.2rem); font-weight: 700; text-wrap: balance; opacity: 0; transition: opacity 800ms ease; z-index: 5; text-shadow: 1px 1px 3px rgba(255,255,255,.5); padding: 0 .5rem; }
     .phrase-container[aria-hidden="false"] { opacity: 1; }
 
     /* Ramo */
     .bouquet { position: relative; width: 100%; height: 100%; opacity: 0; transform: translateZ(0) scale(var(--bouquet-scale,1)); transform-origin: center bottom; will-change: transform; transition: opacity .9s ease, transform .35s ease; }
     .bouquet.is-visible { opacity: 1; }
 
-    .stem { --h: 14rem; --x: 0%; --dur: 5s; position: absolute; bottom: 0; left: 50%; translate: var(--x) 0; width: .3rem; height: var(--h); background: linear-gradient(to right, var(--tallo-oscuro), var(--tallo-claro)); border-radius: 6px; transform-origin: bottom; animation: sway var(--dur) ease-in-out infinite alternate; z-index: 1; }
+    .stem { --h: 14rem; --x: 0%; --dur: 5s; position: absolute; bottom: 0; left: calc(50% + var(--x)); width: .3rem; height: var(--h); background: linear-gradient(to right, var(--tallo-oscuro), var(--tallo-claro)); border-radius: 6px; transform-origin: bottom; animation: sway var(--dur) ease-in-out infinite alternate; z-index: 1; }
 
     @keyframes sway { from { rotate: -8deg; } to { rotate: 8deg; } }
+
+    /* Fallback para Safari que no soporta propiedades individuales de transform */
+    @supports not (rotate: 1deg) {
+      @keyframes sway_legacy { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
+      .stem { animation-name: sway_legacy; }
+    } to { rotate: 8deg; } }
 
     .flower { position: absolute; top: -5rem; left: -3rem; z-index: 2; }
     .ring { position: relative; width: calc(var(--R) * 2); height: calc(var(--R) * 2); }
@@ -218,7 +226,23 @@
 
     // ===== Audio =====
     let actx = null;
-    function playChime() { if (!audioOn) return; if (!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); const t0 = actx.currentTime; const o = actx.createOscillator(); const g = actx.createGain(); o.type='sine'; o.frequency.setValueAtTime(660, t0); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.08, t0+0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0+0.5); o.connect(g).connect(actx.destination); o.start(t0); o.stop(t0+0.52); }
+    function playChime() {
+      if (!audioOn) return;
+      try {
+        if (!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
+        const t0 = actx.currentTime;
+        const o = actx.createOscillator();
+        const g = actx.createGain();
+        o.type='sine'; o.frequency.setValueAtTime(660, t0);
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(0.08, t0+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0+0.5);
+        o.connect(g).connect(actx.destination);
+        o.start(t0); o.stop(t0+0.52);
+      } catch(e) {
+        // iOS en modo estricto o sin gesto de usuario: silenciamos gracefully
+      }
+    }
 
     // ===== Elementos =====
     const modal = $('#mood-modal');
