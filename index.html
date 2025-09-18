@@ -26,7 +26,7 @@
     html { font-size: 16px; }
     body {
       min-height: 100vh; /* fallback amplio */
-      min-height: 100svh; /* iOS moderno: evita saltos al mostrar barra */ /* estable en iOS Safari */
+      min-height: 100svh; /* iOS moderno: evita saltos al mostrar barra */
       display: grid;
       place-items: end center;
       background: linear-gradient(var(--cielo-claro), var(--cielo-horizonte));
@@ -48,124 +48,71 @@
 
     @keyframes skyShift { 0% { background-position: 0% 0%; } 100%{ background-position: 0% 100%; } }
 
-    /* Modal */
+    /* Modal base */
     .modal { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.2); z-index: 1000; }
     .modal[hidden] { display: none; }
-@supports (background: color-mix(in srgb, #000 20%, transparent)) {
-  .modal { background: color-mix(in srgb, #000 20%, transparent); }
-}
+    @supports (background: color-mix(in srgb, #000 20%, transparent)) {
+      .modal { background: color-mix(in srgb, #000 20%, transparent); }
+    }
     .modal__panel { position: relative; background: #fff; color:#222; width: min(92vw, 420px); padding: 1.5rem; border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,.25); margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
     .modal__title { font-size: 1.25rem; margin: 0 2rem 1rem; text-align: center; }
     .modal__actions { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
     .btn { border: 0; border-radius: 10px; padding: .9rem 1.1rem; font-weight: 700; cursor: pointer; color: #fff; background: var(--boton-fondo); transition: transform .15s ease, background .2s ease; min-height: 44px; touch-action: manipulation; }
     .btn:hover { background: var(--boton-hover); transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+    .btn:focus-visible { outline: 3px solid color-mix(in srgb, #2563eb 45%, transparent); outline-offset: 2px; }
+
     /* Botón ghost con alto contraste (legible sobre cielo pastel) */
-.btn--ghost {
-  background: rgba(255,255,255,.88);
-  color: #1f2937;
-  border: 1px solid rgba(0,0,0,.15);
-  box-shadow: 0 2px 6px rgba(0,0,0,.12);
-}
-.btn--ghost:hover { background: #fff; border-color: rgba(0,0,0,.25); }
-.btn--ghost:active { transform: translateY(0); }
-.btn--ghost:focus-visible { outline: 3px solid color-mix(in srgb, #2563eb 45%, transparent); outline-offset: 2px; }
-.theme-night .btn--ghost { background: rgba(28,32,45,.75); color: #eaeaea; border-color: rgba(255,255,255,.15); box-shadow: 0 2px 6px rgba(0,0,0,.5); }
-.theme-night .btn--ghost:hover { background: rgba(36,42,58,.9); border-color: rgba(255,255,255,.25); }
+    .btn--ghost { background: rgba(255,255,255,.88); color: #1f2937; border: 1px solid rgba(0,0,0,.15); box-shadow: 0 2px 6px rgba(0,0,0,.12); }
+    .btn--ghost:hover { background: #fff; border-color: rgba(0,0,0,.25); }
+    .theme-night .btn--ghost { background: rgba(28,32,45,.75); color: #eaeaea; border-color: rgba(255,255,255,.15); box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+    .theme-night .btn--ghost:hover { background: rgba(36,42,58,.9); border-color: rgba(255,255,255,.25); }
 
     /* Botón de cerrar (X) */
     .modal__close { position: absolute; top: .5rem; right: .5rem; background: transparent; border: none; font-size: 1.25rem; font-weight: 900; color: #444; cursor: pointer; line-height: 1; }
     .modal__close:hover { color: #000; }
 
     /* Frases */
-    .phrase-container { position: fixed; top: var(--phrase-top, 18%); left: 50%;
-    transform: translate(-50%, -50%); /* fallback muy compatible */ width: min(92vw, 820px); text-align: center; font-size: clamp(1.05rem, 3.5vw + .35rem, 2.2rem); font-weight: 700; overflow-wrap: anywhere; opacity: 0; transition: opacity 800ms ease; z-index: 5; text-shadow: 1px 1px 3px rgba(255,255,255,.5); padding: 0 .5rem; }
+    .phrase-container { position: fixed; top: var(--phrase-top, 18%); left: 50%; transform: translate(-50%, -50%); width: min(92vw, 820px); text-align: center; font-size: clamp(1.05rem, 3.5vw + .35rem, 2.2rem); font-weight: 700; overflow-wrap: anywhere; opacity: 0; transition: opacity 800ms ease; z-index: 5; text-shadow: 1px 1px 3px rgba(255,255,255,.5); padding: 0 .5rem; }
     .phrase-container[aria-hidden="false"] { opacity: 1; }
-@supports (text-wrap: balance) {
-  .phrase-container { text-wrap: balance; }
-}
+    @supports (text-wrap: balance) { .phrase-container { text-wrap: balance; } }
 
     /* Ramo */
     .bouquet { position: relative; width: 100%; height: 100%; opacity: 0; transform: translateZ(0) scale(var(--bouquet-scale,1)); transform-origin: center bottom; will-change: transform; transition: opacity .9s ease, transform .35s ease; }
     .bouquet.is-visible { opacity: 1; }
 
     .stem { --h: 14rem; --x: 0rem; --dur: 5s; position: absolute; bottom: 0; left: 50%; width: .3rem; height: var(--h); background: linear-gradient(to right, var(--tallo-oscuro), var(--tallo-claro)); border-radius: 6px; transform-origin: bottom; animation: sway var(--dur) ease-in-out infinite alternate; z-index: 1; }
-
     @keyframes sway { from { transform: translateX(var(--x)) rotate(-8deg); } to { transform: translateX(var(--x)) rotate(8deg); } }
 
-    
-
-
-    /* limpiado: bloque duplicado de fallback eliminado */
-.flower { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); transform-origin: center bottom; z-index: 2; }
+    .flower { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); transform-origin: center bottom; z-index: 2; }
     .ring { position: relative; width: calc(var(--R) * 2); height: calc(var(--R) * 2); }
-
     .petal-wrap { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform: translate(-50%, -50%) rotate(var(--angle)); }
     .petal { width: var(--w); height: var(--l); border-radius: 50% 50% 45% 45% / 55% 55% 45% 45%; transform-origin: 50% 100%; transform: translateY(calc(-1 * var(--R))); filter: drop-shadow(0 1px 1px rgba(0,0,0,.15)); }
-
     .center { position: absolute; top: 50%; left: 50%; width: var(--core, 1.8rem); height: var(--core, 1.8rem); transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(ellipse at 40% 35%, var(--centro-flor), var(--centro-flor-sombra)); box-shadow: inset 0 2px 3px rgba(0,0,0,.25); }
     .ring::after { content: none; }
-
-/* Sutileza en modo noche: un halo muy tenue */
-.theme-night .ring::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 .08rem rgba(255,255,255,.06);
-}
+    .theme-night .ring::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 0 .08rem rgba(255,255,255,.06); }
 
     /* Toolbar: respeta la home bar y el notch */
-    /* Dock inferior con glassmorphism para dar contraste a los botones */
-.toolbar {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: max(1rem, env(safe-area-inset-bottom));
-  display: flex; gap: .4rem; flex-wrap: nowrap; justify-content: center; align-items: center; z-index: 20;
-  background: rgba(255,255,255,.35);
-  border: 1px solid rgba(0,0,0,.08);
-  padding: .4rem .5rem; border-radius: 14px;
-  backdrop-filter: saturate(160%) blur(8px);
-  -webkit-backdrop-filter: saturate(160%) blur(8px);
-  box-shadow: 0 8px 20px rgba(0,0,0,.12);
-}
-.toolbar .btn{ padding: .6rem .8rem; font-size: .9rem; min-height: 36px; }
-.theme-night .toolbar{
-  background: rgba(15,18,28,.35);
-  border-color: rgba(255,255,255,.08);
-  box-shadow: 0 8px 22px rgba(0,0,0,.45);
-}
+    .toolbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(1rem, env(safe-area-inset-bottom)); display: flex; gap: .4rem; flex-wrap: nowrap; justify-content: center; align-items: center; z-index: 20; background: rgba(255,255,255,.35); border: 1px solid rgba(0,0,0,.08); padding: .4rem .5rem; border-radius: 14px; backdrop-filter: saturate(160%) blur(8px); -webkit-backdrop-filter: saturate(160%) blur(8px); box-shadow: 0 8px 20px rgba(0,0,0,.12); }
+    .toolbar .btn{ padding: .6rem .8rem; font-size: .9rem; min-height: 36px; }
+    .theme-night .toolbar{ background: rgba(15,18,28,.35); border-color: rgba(255,255,255,.08); box-shadow: 0 8px 22px rgba(0,0,0,.45); }
 
-/* Botón icono (sonido) arriba a la derecha */
-.icon-btn {
-  position: fixed;
-  top: max(1rem, env(safe-area-inset-top));
-  right: max(1rem, env(safe-area-inset-right));
-  z-index: 22;
-  width: 44px; height: 44px;
-  border-radius: 999px;
-  display: grid; place-items: center;
-  border: 1px solid rgba(0,0,0,.15);
-  background: rgba(255,255,255,.82);
-  box-shadow: 0 6px 16px rgba(0,0,0,.15);
-  font-size: 1.05rem; cursor: pointer;
-  backdrop-filter: saturate(160%) blur(6px);
-  -webkit-backdrop-filter: saturate(160%) blur(6px);
-}
-.icon-btn:hover{ background:#fff; }
-.theme-night .icon-btn{ background: rgba(28,32,45,.78); color:#eaeaea; border-color: rgba(255,255,255,.18); box-shadow: 0 6px 20px rgba(0,0,0,.45);}
-@media (max-width: 430px) and (min-height: 700px){
-  .toolbar{ left: 50%; right: auto; transform: translateX(-50%); bottom: max(.75rem, env(safe-area-inset-bottom)); gap: .3rem; padding: .35rem .45rem; flex-wrap: nowrap; }
-  .toolbar .btn{ padding: .55rem .75rem; font-size: .9rem; min-height: 34px; }
-}
-  .toolbar .btn{ padding: .8rem 1rem; font-size: .95rem; }
-}
-@media (max-height: 480px){
-  .toolbar{ padding: .3rem .4rem; gap: .25rem; flex-wrap: nowrap; }
-  .toolbar .btn{ padding: .5rem .7rem; font-size: .85rem; min-height: 32px; }
-}
-  .toolbar .btn{ padding: .7rem .9rem; font-size: .9rem; }
-}
+    /* Botón icono (sonido) arriba a la derecha */
+    .icon-btn { position: fixed; top: max(1rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); z-index: 22; width: 44px; height: 44px; border-radius: 999px; display: grid; place-items: center; border: 1px solid rgba(0,0,0,.15); background: rgba(255,255,255,.82); box-shadow: 0 6px 16px rgba(0,0,0,.15); font-size: 1.05rem; cursor: pointer; backdrop-filter: saturate(160%) blur(6px); -webkit-backdrop-filter: saturate(160%) blur(6px); }
+    .icon-btn:hover{ background:#fff; }
+    .theme-night .icon-btn{ background: rgba(28,32,45,.78); color:#eaeaea; border-color: rgba(255,255,255,.18); box-shadow: 0 6px 20px rgba(0,0,0,.45);}    
+
+    @media (max-width: 430px) and (min-height: 700px){
+      .toolbar{ left: 50%; right: auto; transform: translateX(-50%); bottom: max(.75rem, env(safe-area-inset-bottom)); gap: .3rem; padding: .35rem .45rem; }
+      .toolbar .btn{ padding: .55rem .75rem; font-size: .9rem; min-height: 34px; }
+    }
+    @media (max-height: 480px){
+      body { place-items: center; }
+      .phrase-container { top: calc(env(safe-area-inset-top) + 12vh); font-size: clamp(.95rem, 3.8vw + .2rem, 1.4rem); }
+      .stem { --h: 12rem; }
+      .flower { transform: translate(-50%, -50%) scale(.8); transform-origin: center bottom; }
+      .toolbar { gap: .4rem; }
+    }
 
     @media (prefers-reduced-motion: reduce) { body { animation: none; } .stem { animation: none; } .phrase-container { transition: none; } }
 
@@ -175,7 +122,6 @@
     /* ============================ */
     @media (max-width: 430px) and (min-height: 700px) {
       .phrase-container { top: calc(env(safe-area-inset-top) + 16vh); font-size: clamp(1rem, 4.5vw + .25rem, 1.6rem); }
-
       .modal__panel { width: min(92vw, 360px); }
       .btn { padding: .9rem 1rem; }
       .stem { width: .28rem; }
@@ -186,16 +132,37 @@
     /*     iPhone 11 - Apaisado     */
     /* ============================ */
     @media (max-height: 480px) {
-      body { place-items: center; }
-
       .phrase-container { top: calc(env(safe-area-inset-top) + 12vh); font-size: clamp(.95rem, 3.8vw + .2rem, 1.4rem); }
       .stem { --h: 12rem; }
       .flower { transform: translate(-50%, -50%) scale(.8); transform-origin: center bottom; }
       .toolbar { gap: .4rem; }
     }
+
+    /* ======= Carta secreta ======= */
+    .secret { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.25); z-index: 1100; }
+    .secret[hidden] { display: none; }
+    .letter { position: relative; width: min(92vw, 680px); max-height: min(78vh, 720px); overflow: hidden auto; border-radius: 16px; padding: 1.25rem 1.25rem 1.5rem; background: #fff; color:#1f2937; border: 1px solid rgba(0,0,0,.08); box-shadow: 0 14px 34px rgba(0,0,0,.28); transform: translateY(10px) scale(.98); opacity: 0; animation: popIn .28s ease forwards; }
+    .theme-night .letter { background: #0f1623; color: #eaeaea; border-color: rgba(255,255,255,.12); box-shadow: 0 14px 38px rgba(0,0,0,.55); }
+    @keyframes popIn { to { transform: translateY(0) scale(1); opacity: 1; } }
+    .letter__close { position: absolute; top: .6rem; right: .6rem; background: transparent; border: 0; font-weight: 900; font-size: 1.2rem; cursor: pointer; color: inherit; }
+    .letter__title { font-size: 1.3rem; text-align: center; margin: .25rem 2rem 1rem; }
+    .letter__body { line-height: 1.6; font-size: 1.05rem; }
+    .letter__body p + p { margin-top: .85rem; }
+
+    /* ======= Modal del código ======= */
+    .code-form { display: flex; flex-direction: column; gap: .8rem; }
+    .code-input { width: 100%; padding: .85rem .9rem; border-radius: 10px; border: 1px solid rgba(0,0,0,.15); font-size: 1rem; }
+    .code-hint { min-height: 1.25rem; text-align: center; font-size: .95rem; }
+    .theme-night .modal__panel { background: #0f1623; color: #eaeaea; border: 1px solid rgba(255,255,255,.1); }
+    .theme-night .code-input { background: rgba(255,255,255,.06); color: #fff; border-color: rgba(255,255,255,.15); }
+
+    .visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    @keyframes shake { 10%, 90% { transform: translateX(-1px); } 20%, 80% { transform: translateX(2px); } 30%, 50%, 70% { transform: translateX(-4px); } 40%, 60% { transform: translateX(4px); } }
+    .shake { animation: shake .45s cubic-bezier(.36,.07,.19,.97) both; }
   </style>
 </head>
 <body>
+  <!-- Modal de estado de ánimo -->
   <div class="modal" id="mood-modal" role="dialog" aria-modal="true" aria-labelledby="mood-title">
     <div class="modal__panel">
       <button class="modal__close" id="close-modal" aria-label="Cerrar">✕</button>
@@ -207,13 +174,39 @@
     </div>
   </div>
 
+  <!-- Modal del código secreto -->
+  <div class="modal" id="code-modal" role="dialog" aria-modal="true" aria-labelledby="code-title" hidden>
+    <div class="modal__panel">
+      <button class="modal__close" id="close-code" aria-label="Cerrar">✕</button>
+      <h2 id="code-title" class="modal__title">Ingresa tu código</h2>
+      <form id="code-form" class="code-form" autocomplete="off">
+        <label class="visually-hidden" for="code-input">Código</label>
+        <input id="code-input" class="code-input" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="Ingresa 4 dígitos" required pattern="\d{4}" maxlength="4" />
+        <button class="btn" type="submit">Desbloquear</button>
+        <p class="code-hint" id="code-hint" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Carta secreta -->
+  <section id="secret" class="secret" aria-hidden="true" hidden>
+    <div class="letter" role="document" aria-labelledby="letter-title">
+      <button class="letter__close" id="close-letter" aria-label="Ocultar carta">✕</button>
+      <h3 class="letter__title" id="letter-title"></h3>
+      <div class="letter__body" id="letter-body"></div>
+    </div>
+  </section>
+
+  <!-- Frase y ramo -->
   <div id="phrase" class="phrase-container" role="status" aria-live="polite" aria-hidden="true"></div>
   <div id="bouquet" class="bouquet" aria-hidden="true"></div>
 
+  <!-- Barra de herramientas -->
   <div class="toolbar" aria-label="Herramientas">
-    <button class="btn btn--ghost" id="change-mood" title="Cambiar estado">Cambiar estado</button>
+    <button class="btn btn--ghost" id="change-mood" title="Cambiar estado">Estado</button>
     <button class="btn btn--ghost" id="pause-anim" title="Pausar animación">Pausar</button>
     <button class="btn btn--ghost" id="toggle-theme" title="Cambiar tema">Modo noche</button>
+    <button class="btn btn--ghost" id="open-code" title="Ingresar código">Código</button>
   </div>
   
   <!-- Icono de sonido arriba a la derecha -->
@@ -221,7 +214,6 @@
 
   <script>
     // ===== Paletas por flor (se barajan en cada render) =====
-    // ===== Paleta 'solo pastel' realista (gerberas) =====
     const TONES = [
       {h:50, s:60, l:76},  // amarillo suave
       {h:42, s:55, l:78},  // ámbar pastel
@@ -247,7 +239,7 @@
       return tones.map(makePastelGradient);
     }
 
-    // ===== Frases (con más contenido y la especial en ambas) =====
+    // ===== Frases =====
     const PHRASES = {
       feliz: [
         'Te quiero mucho mi niña <3',
@@ -285,6 +277,8 @@
     const shuffle = a => Array.isArray(a) ? a.slice().sort(()=>Math.random()-.5) : [];
     const store = { get: (k,def)=>{ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch{ return def; } }, set: (k,v)=>{ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} } };
 
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
     // ===== Estado =====
     let mood = store.get('mood', null);
     let phrases = [];
@@ -308,9 +302,7 @@
         g.gain.exponentialRampToValueAtTime(0.0001, t0+0.5);
         o.connect(g).connect(actx.destination);
         o.start(t0); o.stop(t0+0.52);
-      } catch(e) {
-        // iOS en modo estricto o sin gesto de usuario: silenciamos gracefully
-      }
+      } catch(e) { /* iOS en modo estricto: silenciamos gracefully */ }
     }
 
     // ===== Elementos =====
@@ -401,8 +393,8 @@
         bouquet.appendChild(s);
       });
     }
+
     // ===== Layout auto-escala y posición de frase =====
-    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
     function fitLayout(){
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const scale = clamp(vh / 820, 0.8, 1.25);
@@ -432,32 +424,24 @@
       mood = next; store.set('mood', mood);
       phrases = shuffle(PHRASES[mood]); phraseIdx = 0;
       renderBouquet(); bouquet.classList.add('is-visible'); bouquet.setAttribute('aria-hidden', 'false');
-      closeModal(); cyclePhrase(); playChime(); fitLayout();
+      closeMoodModal(); cyclePhrase(); playChime(); fitLayout();
     }
 
-    // ===== Modal =====
-    function openModal(){ modal.hidden = false; $('#btn-feliz').focus(); }
-    function closeModal(){ modal.hidden = true; }
-    btnClose.addEventListener('click', closeModal);
-    modal.addEventListener('click', e=>{ if(e.target === modal) closeModal(); });
-    document.addEventListener('keydown', e=>{ if(!modal.hidden && e.key==='Escape') closeModal(); });
-
-    // Click en Feliz/Triste
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-mood]');
-      if (btn) setMood(btn.dataset.mood);
-    });
+    // ===== Modal (estado de ánimo) =====
+    function openMoodModal(){ modal.hidden = false; $('#btn-feliz').focus(); }
+    function closeMoodModal(){ modal.hidden = true; }
+    btnClose.addEventListener('click', closeMoodModal);
+    modal.addEventListener('click', e=>{ if(e.target === modal) closeMoodModal(); });
+    document.addEventListener('keydown', e=>{ if(!modal.hidden && e.key==='Escape') closeMoodModal(); });
+    document.addEventListener('click', (e) => { const btn = e.target.closest('[data-mood]'); if (btn) setMood(btn.dataset.mood); });
 
     // ===== Toolbar =====
-    $('#change-mood').addEventListener('click', openModal);
+    $('#change-mood').addEventListener('click', openMoodModal);
     $('#pause-anim').addEventListener('click', () => {
-      paused = !paused;
-      const state = paused ? 'paused' : 'running';
-      bouquet.style.animationPlayState = state;
-      $$('.stem', bouquet).forEach(s => s.style.animationPlayState = state);
+      paused = !paused; const state = paused ? 'paused' : 'running';
+      bouquet.style.animationPlayState = state; $$('.stem', bouquet).forEach(s => s.style.animationPlayState = state);
       $('#pause-anim').textContent = paused ? 'Reanudar' : 'Pausar';
     });
-
     function applyTheme(night){
       document.body.classList.toggle('theme-night', night);
       $('#toggle-theme').textContent = night ? 'Modo día' : 'Modo noche';
@@ -467,18 +451,127 @@
     $('#toggle-theme').addEventListener('click', ()=> applyTheme(!document.body.classList.contains('theme-night')));
 
     function refreshAudioBtn(){
-      const b = $('#toggle-audio');
-      if(!b) return;
-      const on = audioOn;
-      b.textContent = on ? '🔈' : '🔇';
+      const b = $('#toggle-audio'); if(!b) return;
+      const on = audioOn; b.textContent = on ? '🔈' : '🔇';
       b.setAttribute('aria-label', on ? 'Desactivar sonido' : 'Activar sonido');
       b.title = on ? 'Desactivar sonido' : 'Activar sonido';
     }
     refreshAudioBtn();
     $('#toggle-audio').addEventListener('click', ()=>{ audioOn=!audioOn; store.set('audioOn', audioOn); refreshAudioBtn(); });
 
+    // ======= SECRETO: configuración =======
+    /**
+     * Para mayor privacidad, aquí guardamos SOLO los hashes SHA-256 de los códigos válidos.
+     * Cómo generar un hash para tu código (en la consola del navegador):
+     * (async()=>{const d=await crypto.subtle.digest('SHA-256', new TextEncoder().encode('TU-CODIGO'));
+     *  console.log([...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join(''));})();
+     */
+    const SECRET_BOOK = {
+      // código válido: "2209"
+      // SHA-256 => 9e4067ac93c6febda554d724d453d78bf3e28a7742cdec57ee47c5c706fbe940
+      "9e4067ac93c6febda554d724d453d78bf3e28a7742cdec57ee47c5c706fbe940": {
+        title: "Carta para ti",
+        bodyHtml: `
+          <p>Gracias por estar. Por lo simple y por lo grande, por las risas chiquitas
+          y por los abrazos que arreglan el día. Quise dejarte estas flores y esta carta
+          para recordarte que eres mi lugar favorito.</p>
+          <p>Si hoy es difícil, tómate mi mano (aunque sea con el pensamiento). Si hoy es hermoso,
+          guárdalo: quiero celebrarlo contigo. Eres luz, eres calma y también chispa.
+          Me haces creer que lo bonito sí existe y está aquí.</p>
+          <p>Te quiero, hoy y todos los días.</p>
+        `
+      }
+      // Puedes agregar más entradas: "<hash>": { title:"...", bodyHtml:"..." }
+    };
+
+    // ======= SECRETO: helpers =======
+    async function sha256Hex(input){
+      const data = new TextEncoder().encode(input);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+
+    function showSecret(hash){
+      const rec = SECRET_BOOK[hash]; if(!rec) return;
+      $('#letter-title').textContent = rec.title || 'Carta';
+      $('#letter-body').innerHTML = rec.bodyHtml || '';
+      const sec = $('#secret'); sec.hidden = false; sec.setAttribute('aria-hidden','false');
+      setTimeout(()=>{ $('#close-letter').focus(); }, 50);
+    }
+    function hideSecret(){
+      const sec = $('#secret'); sec.hidden = true; sec.setAttribute('aria-hidden','true');
+    }
+
+    // ======= SECRETO: modal del código =======
+    const codeModal = $('#code-modal');
+    const codeForm = $('#code-form');
+    const codeInput = $('#code-input');
+    const codeHint = $('#code-hint');
+
+    function openCodeModal(){ codeModal.hidden = false; codeInput.value=''; codeHint.textContent=''; setTimeout(()=>codeInput.focus(), 50); }
+    function closeCodeModal(){ codeModal.hidden = true; }
+
+    $('#open-code').addEventListener('click', openCodeModal);
+    $('#close-code').addEventListener('click', closeCodeModal);
+    codeModal.addEventListener('click', e=>{ if(e.target === codeModal) closeCodeModal(); });
+    document.addEventListener('keydown', e=>{ if(!codeModal.hidden && e.key==='Escape') closeCodeModal(); });
+
+    // Pequeño rate-limit local (3 intentos, espera de 60s)
+    function getAttempts(){
+      const now = Date.now();
+      const st = store.get('codeAttempts', {count:0, until:0});
+      if (st.until && now > st.until) return {count:0, until:0};
+      return st;
+    }
+    function setAttempts(st){ store.set('codeAttempts', st); }
+
+    codeForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const st = getAttempts();
+      if (st.until && Date.now() < st.until){
+        const secs = Math.ceil((st.until - Date.now())/1000);
+        codeHint.textContent = `Demasiados intentos. Intenta en ${secs}s.`; 
+        codeInput.classList.add('shake'); setTimeout(()=>codeInput.classList.remove('shake'), 500);
+        return;
+      }
+      const value = codeInput.value.trim();
+      if (!value) return;
+      try {
+        const hex = await sha256Hex(value);
+        if (SECRET_BOOK[hex]){
+          store.set('secretHash', hex);
+          setAttempts({count:0, until:0});
+          closeCodeModal(); showSecret(hex);
+        } else {
+          const next = {count: (st.count||0)+1, until: 0};
+          if (next.count >= 3) { next.count = 0; next.until = Date.now() + 60*1000; }
+          setAttempts(next);
+          codeHint.textContent = 'Código incorrecto 😔';
+          codeInput.classList.add('shake'); setTimeout(()=>codeInput.classList.remove('shake'), 500);
+          codeInput.select();
+        }
+      } catch(err){ codeHint.textContent = 'Hubo un error. Intenta de nuevo.'; }
+    });
+
+    $('#close-letter').addEventListener('click', ()=>{ hideSecret(); });
+
+    // Autodesbloqueo si ya se ingresó antes
+    (function autounlock(){
+      const saved = store.get('secretHash', null);
+      if (saved && SECRET_BOOK[saved]){
+        setTimeout(()=>showSecret(saved), 600);
+      }
+    })();
+
+    // Acceso rápido con tecla L
+    document.addEventListener('keydown', (e)=>{
+      if (e.key.toLowerCase()==='l' && (e.ctrlKey || e.altKey || e.metaKey)){
+        openCodeModal();
+      }
+    });
+
     // ===== Inicio =====
-    if (mood) { setMood(mood); } else { openModal(); }
+    if (mood) { setMood(mood); } else { openMoodModal(); }
     fitLayout();
   </script>
 </body>
