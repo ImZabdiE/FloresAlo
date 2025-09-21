@@ -1,26 +1,676 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Activación</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Te amo</title>
   <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+    :root{
+      --cielo-claro:#87CEEB; --cielo-horizonte:#E0F6FF;
+      --cielo-noche-1:#0b1b2b; --cielo-noche-2:#132c45;
+      --tallo-oscuro:#2d5a27; --tallo-claro:#3c7a34;
+      --centro-flor:#4b2e1e; --centro-flor-sombra:#2e1b11;
+      --texto-principal:#333; --boton-fondo:#4a3520; --boton-hover:#6b4e3a;
+      --radius:12px;
     }
-    h1 {
-      font-size: 2.5em;
-      text-align: center;
+    *{box-sizing:border-box;margin:0}
+    html{font-size:16px}
+    body{
+      min-height:100vh; min-height:100svh;
+      display:grid; place-items:end center;
+      background:linear-gradient(var(--cielo-claro),var(--cielo-horizonte));
+      background-size:100% 200%;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--texto-principal);
+      overflow:hidden;
+      animation:skyShift 24s ease-in-out infinite alternate;
+      -webkit-animation:skyShift 24s ease-in-out infinite alternate;
+      -webkit-tap-highlight-color:transparent;
     }
+    .theme-night{
+      --texto-principal:#eaeaea; --boton-fondo:#2b2b35; --boton-hover:#3b3b47;
+      background:linear-gradient(var(--cielo-noche-1),var(--cielo-noche-2));
+      animation-duration:36s; -webkit-animation-duration:36s;
+    }
+    @keyframes skyShift{0%{background-position:0% 0%}100%{background-position:0% 100%}}
+    @-webkit-keyframes skyShift{0%{background-position:0% 0%}100%{background-position:0% 100%}}
+
+    /* Modales */
+    .modal{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.2);z-index:1000}
+    .modal[hidden]{display:none}
+    @supports (background:color-mix(in srgb,#000 20%,transparent)){
+      .modal{background:color-mix(in srgb,#000 20%,transparent)}
+    }
+    .modal__panel{position:relative;background:#fff;color:#222;width:min(92vw,420px);padding:1.5rem;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.25);margin:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+    .modal__title{font-size:1.25rem;margin:0 2rem 1rem;text-align:center}
+    .modal__actions{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap}
+    .btn{border:0;border-radius:10px;padding:.9rem 1.1rem;font-weight:700;cursor:pointer;color:#fff;background:var(--boton-fondo);transition:transform .15s ease,background .2s ease;min-height:44px;touch-action:manipulation}
+    .btn:hover{background:var(--boton-hover);transform:translateY(-2px)}
+    .btn:active{transform:translateY(0)}
+    .btn:focus-visible{outline:3px solid color-mix(in srgb,#2563eb 45%,transparent);outline-offset:2px}
+    .btn--ghost{background:rgba(255,255,255,.88);color:#1f2937;border:1px solid rgba(0,0,0,.15);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+    .btn--ghost:hover{background:#fff;border-color:rgba(0,0,0,.25)}
+    .theme-night .btn--ghost{background:rgba(28,32,45,.75);color:#eaeaea;border-color:rgba(255,255,255,.15);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+    .theme-night .btn--ghost:hover{background:rgba(36,42,58,.9);border-color:rgba(255,255,255,.25)}
+    .modal__close{position:absolute;top:.5rem;right:.5rem;background:transparent;border:none;font-size:1.25rem;font-weight:900;color:#444;cursor:pointer;line-height:1}
+    .modal__close:hover{color:#000}
+
+    /* Frases + ramo */
+    .phrase-container{position:fixed;top:var(--phrase-top,18%);left:50%;transform:translate(-50%,-50%);width:min(92vw,820px);text-align:center;font-size:clamp(1.05rem,3.5vw + .35rem,2.2rem);font-weight:700;overflow-wrap:anywhere;opacity:0;transition:opacity 800ms ease;z-index:5;text-shadow:1px 1px 3px rgba(255,255,255,.5);padding:0 .5rem}
+    .phrase-container[aria-hidden="false"]{opacity:1}
+    @supports (text-wrap:balance){.phrase-container{text-wrap:balance}}
+
+    .bouquet{
+      position:relative;width:100%;height:100%;
+      opacity:0; transform:translateZ(0) scale(var(--bouquet-scale,1));
+      -webkit-transform:translateZ(0) scale(var(--bouquet-scale,1));
+      transform-origin:center bottom; -webkit-transform-origin:center bottom;
+      will-change:transform,opacity;
+      transition:opacity .9s ease, transform .35s ease;
+      -webkit-transition:opacity .9s ease, -webkit-transform .35s ease;
+    }
+    .bouquet.is-visible{opacity:1}
+
+    .stem{
+      --h:14rem; --x:0rem; --dur:5s;
+      position:absolute; bottom:0; left:50%;
+      width:.3rem; height:var(--h);
+      background:linear-gradient(to right,var(--tallo-oscuro),var(--tallo-claro));
+      border-radius:6px;
+      transform-origin:bottom; -webkit-transform-origin:bottom;
+      will-change:transform;
+      transform:translate3d(0,0,0); -webkit-transform:translate3d(0,0,0);
+      animation:sway var(--dur) ease-in-out infinite alternate both;
+      -webkit-animation:sway var(--dur) ease-in-out infinite alternate both;
+      z-index:1;
+    }
+    @keyframes sway{
+      from{ transform:translate3d(var(--x),0,0) rotate(-8deg) }
+      to  { transform:translate3d(var(--x),0,0) rotate( 8deg) }
+    }
+    @-webkit-keyframes sway{
+      from{ -webkit-transform:translate3d(var(--x),0,0) rotate(-8deg) }
+      to  { -webkit-transform:translate3d(var(--x),0,0) rotate( 8deg) }
+    }
+
+    .flower{position:absolute;top:0;left:50%;transform:translate(-50%,-50%);-webkit-transform:translate(-50%,-50%);transform-origin:center bottom;-webkit-transform-origin:center bottom;z-index:2}
+    .ring{position:relative;width:calc(var(--R) * 2);height:calc(var(--R) * 2)}
+    .petal-wrap{position:absolute;top:50%;left:50%;width:0;height:0;transform:translate(-50%,-50%) rotate(var(--angle));-webkit-transform:translate(-50%,-50%) rotate(var(--angle))}
+    .petal{width:var(--w);height:var(--l);border-radius:50% 50% 45% 45% / 55% 55% 45% 45%;transform-origin:50% 100%;-webkit-transform-origin:50% 100%;transform:translateY(calc(-1 * var(--R)));-webkit-transform:translateY(calc(-1 * var(--R)));filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
+    .center{position:absolute;top:50%;left:50%;width:var(--core,1.8rem);height:var(--core,1.8rem);transform:translate(-50%,-50%);-webkit-transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at 40% 35%,var(--centro-flor),var(--centro-flor-sombra));box-shadow:inset 0 2px 3px rgba(0,0,0,.25)}
+    .ring::after{content:none}
+    .theme-night .ring::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 .08rem rgba(255,255,255,.06)}
+
+    /* Toolbar */
+    .toolbar{position:fixed;left:50%;transform:translateX(-50%);bottom:max(1rem,env(safe-area-inset-bottom));display:flex;gap:.4rem;flex-wrap:nowrap;justify-content:center;align-items:center;z-index:20;background:rgba(255,255,255,.35);border:1px solid rgba(0,0,0,.08);padding:.4rem .5rem;border-radius:14px;backdrop-filter:saturate(160%) blur(8px);-webkit-backdrop-filter:saturate(160%) blur(8px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+    .toolbar .btn{padding:.6rem .8rem;font-size:.9rem;min-height:36px}
+    .theme-night .toolbar{background:rgba(15,18,28,.35);border-color:rgba(255,255,255,.08);box-shadow:0 8px 22px rgba(0,0,0,.45)}
+
+    /* Icono de sonido */
+    .icon-btn{position:fixed;top:max(1rem,env(safe-area-inset-top));right:max(1rem,env(safe-area-inset-right));z-index:22;width:44px;height:44px;border-radius:999px;display:grid;place-items:center;border:1px solid rgba(0,0,0,.15);background:rgba(255,255,255,.82);box-shadow:0 6px 16px rgba(0,0,0,.15);font-size:1.05rem;cursor:pointer;backdrop-filter:saturate(160%) blur(6px);-webkit-backdrop-filter:saturate(160%) blur(6px)}
+    .icon-btn:hover{background:#fff}
+    .theme-night .icon-btn{background:rgba(28,32,45,.78);color:#eaeaea;border-color:rgba(255,255,255,.18);box-shadow:0 6px 20px rgba(0,0,0,.45)}
+
+    /* Responsive */
+    @media (max-width:430px) and (min-height:700px){
+      .toolbar{left:50%;right:auto;transform:translateX(-50%);bottom:max(.75rem,env(safe-area-inset-bottom));gap:.3rem;padding:.35rem .45rem}
+      .toolbar .btn{padding:.55rem .75rem;font-size:.9rem;min-height:34px}
+    }
+    @media (max-height:480px){
+      body{place-items:center}
+      .phrase-container{top:calc(env(safe-area-inset-top) + 12vh);font-size:clamp(.95rem,3.8vw + .2rem,1.4rem)}
+      .stem{--h:12rem}
+      .flower{transform:translate(-50%,-50%) scale(.8);-webkit-transform:translate(-50%,-50%) scale(.8);transform-origin:center bottom;-webkit-transform-origin:center bottom}
+      .toolbar{gap:.4rem}
+    }
+    @media (prefers-reduced-motion:reduce){
+      body{animation:none;-webkit-animation:none}
+      .stem{animation:none;-webkit-animation:none}
+      .phrase-container{transition:none}
+    }
+    @media (max-width:430px) and (min-height:700px){
+      .phrase-container{top:calc(env(safe-area-inset-top) + 16vh);font-size:clamp(1rem,4.5vw + .25rem,1.6rem)}
+      .modal__panel{width:min(92vw,360px)}
+      .btn{padding:.9rem 1rem}
+      .stem{width:.28rem}
+      .flower{transform:translate(-50%,-50%) scale(.9);-webkit-transform:translate(-50%,-50%) scale(.9);transform-origin:center bottom;-webkit-transform-origin:center bottom}
+    }
+
+    /* Carta secreta */
+    .secret{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.25);z-index:1100}
+    .secret[hidden]{display:none}
+    .letter{position:relative;width:min(92vw,680px);max-height:min(78vh,720px);overflow:hidden auto;border-radius:16px;padding:1.25rem 1.25rem 1.5rem;background:#fff;color:#1f2937;border:1px solid rgba(0,0,0,.08);box-shadow:0 14px 34px rgba(0,0,0,.28);transform:translateY(10px) scale(.98);opacity:0;animation:popIn .28s ease forwards}
+    .theme-night .letter{background:#0f1623;color:#eaeaea;border-color:rgba(255,255,255,.12);box-shadow:0 14px 38px rgba(0,0,0,.55)}
+    @keyframes popIn{to{transform:translateY(0) scale(1);opacity:1}}
+    .letter__close{position:absolute;top:.6rem;right:.6rem;background:transparent;border:0;font-weight:900;font-size:1.2rem;cursor:pointer;color:inherit}
+    .letter__title{font-size:1.3rem;text-align:center;margin:.25rem 2rem 1rem}
+    .letter__body{line-height:1.6;font-size:1.05rem}
+    .letter__body p + p{margin-top:.85rem}
+
+    .code-form{display:flex;flex-direction:column;gap:.8rem}
+    .code-input{width:100%;padding:.85rem .9rem;border-radius:10px;border:1px solid rgba(0,0,0,.15);font-size:1rem}
+    .code-hint{min-height:1.25rem;text-align:center;font-size:.95rem}
+    .theme-night .modal__panel{background:#0f1623;color:#eaeaea;border:1px solid rgba(255,255,255,.1)}
+    .theme-night .code-input{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.15)}
+
+    .visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+    @keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+    .shake{animation:shake .45s cubic-bezier(.36,.07,.19,.97) both}
+
+    /* Canvas de fuegos artificiales */
+    #fireworks-canvas{
+      position:fixed; inset:0; width:100vw; height:100vh;
+      pointer-events:none; z-index:1200;
+    }
+
+    /* Mensaje post-fuegos (“¡Dijo que sí!”) */
+    #yes-toast{
+      position:fixed; inset:0; display:grid; place-items:center;
+      z-index:1300; pointer-events:none;
+    }
+    #yes-toast .bubble{
+      background:rgba(255,255,255,.92);
+      color:#111; padding:1rem 1.25rem; border-radius:14px;
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 10px 28px rgba(0,0,0,.22);
+      font-weight:800; letter-spacing:.3px;
+      font-size:clamp(1.1rem,3.2vw + .2rem,1.6rem);
+      opacity:0; transform:translateY(6px) scale(.98);
+      animation:toastIn .35s ease forwards;
+      text-align:center;
+    }
+    .theme-night #yes-toast .bubble{
+      background:rgba(20,26,40,.9); color:#f4f6ff;
+      border-color:rgba(255,255,255,.12);
+      box-shadow:0 10px 30px rgba(0,0,0,.55);
+    }
+    @keyframes toastIn{to{opacity:1; transform:translateY(0) scale(1)}}
+
+    /* ▼ CAMBIO: pétalos amarillos renombrados para no colisionar con .petal del ramo */
+    .falling-petal{
+      position:fixed; top:-5vh;
+      width:18px; height:12px;
+      background: radial-gradient(circle at 30% 30%, #ffec85, #f2c200);
+      border-radius:60% 40% 60% 40%;
+      opacity:0.9; pointer-events:none;
+      animation:fallPetal linear forwards;
+      z-index:1250;
+    }
+    @keyframes fallPetal{
+      to{ transform:translateY(110vh) rotate(360deg); opacity:0; }
+    }
+    /* ▲ FIN CAMBIO */
   </style>
 </head>
 <body>
-  <h1>se activa el 22 / 09 / 2025</h1>
+  <!-- Modal de estado de ánimo (oculto de inicio) -->
+  <div class="modal" id="mood-modal" role="dialog" aria-modal="true" aria-labelledby="mood-title" hidden>
+    <div class="modal__panel">
+      <button class="modal__close" id="close-modal" aria-label="Cerrar">✕</button>
+      <h2 id="mood-title" class="modal__title">¿Cómo te sientes hoy?</h2>
+      <div class="modal__actions">
+        <button class="btn" data-mood="feliz" id="btn-feliz">😊 Feliz</button>
+        <button class="btn" data-mood="triste">💙 Triste</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal del código secreto (no se abre solo) -->
+  <div class="modal" id="code-modal" role="dialog" aria-modal="true" aria-labelledby="code-title" hidden>
+    <div class="modal__panel">
+      <button class="modal__close" id="close-code" aria-label="Cerrar">✕</button>
+      <h2 id="code-title" class="modal__title">Ingresa tu código</h2>
+      <form id="code-form" class="code-form" autocomplete="off">
+        <label class="visually-hidden" for="code-input">Código</label>
+        <input id="code-input" class="code-input" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="Ingresa 4 dígitos" required pattern="\d{4}" maxlength="4" />
+        <button class="btn" type="submit">Desbloquear</button>
+        <p class="code-hint" id="code-hint" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Carta secreta -->
+  <section id="secret" class="secret" aria-hidden="true" hidden>
+    <div class="letter" role="document" aria-labelledby="letter-title">
+      <button class="letter__close" id="close-letter" aria-label="Ocultar carta">✕</button>
+      <h3 class="letter__title" id="letter-title"></h3>
+      <div class="letter__body" id="letter-body"></div>
+    </div>
+  </section>
+
+  <!-- Frase y ramo -->
+  <div id="phrase" class="phrase-container" role="status" aria-live="polite" aria-hidden="true"></div>
+  <div id="bouquet" class="bouquet" aria-hidden="true"></div>
+
+  <!-- Barra de herramientas -->
+  <div class="toolbar" aria-label="Herramientas">
+    <button class="btn btn--ghost" id="change-mood" title="Cambiar estado">Estado</button>
+    <button class="btn btn--ghost" id="pause-anim" title="Pausar animación">Pausar</button>
+    <button class="btn btn--ghost" id="toggle-theme" title="Cambiar tema">Modo noche</button>
+    <button class="btn btn--ghost" id="open-code" title="Ingresar código">Código</button>
+  </div>
+  
+  <!-- Icono de sonido -->
+  <button class="icon-btn sound-btn" id="toggle-audio" title="Activar/Desactivar sonido" aria-label="Activar/Desactivar sonido">🔈</button>
+
+  <script>
+    /* ===================== Paletas y utilidades ===================== */
+    const TONES=[{h:50,s:60,l:76},{h:42,s:55,l:78},{h:30,s:55,l:78},{h:18,s:55,l:76},{h:10,s:55,l:74},{h:2,s:52,l:72},{h:345,s:50,l:76},{h:330,s:45,l:80},{h:45,s:30,l:88}];
+    const hsl=(h,s,l)=>`hsl(${h} ${s}% ${l}%)`;
+    const jitter=(v,sp)=>v+(Math.random()*2-1)*sp;
+    function makePastelGradient(t){const s1=Math.max(25,Math.min(70,jitter(t.s,4)));const s2=Math.max(25,Math.min(70,s1-6));const l1=Math.max(60,Math.min(90,jitter(t.l,3)));const l2=Math.max(65,Math.min(95,l1+6));return{a:hsl(t.h,s1,l1),b:hsl(t.h,s2,l2)}}
+    function buildPastelPalette(n){const tones=shuffle(TONES).slice(0,n);return tones.map(makePastelGradient)}
+    const PHRASES={feliz:['Te quiero mucho mi niña <3','💖 "Me encanta verte feliz, pero lo que más me gusta es saber que una persona tan increíble como tú merece toda esa felicidad y más."','🌟 "Tu energía ilumina todo a tu alrededor. No solo eres increíble, sino que haces que todo sea mejor con tu presencia."','😊 "Si la felicidad tuviera un rostro, seguramente se parecería mucho al tuyo. ¡Brillas con luz propia!"','✨ "Eres de esas personas que le dan color a la vida de los demás."','💫 "Ojalá pudieras verte con mis ojos: eres extraordinaria."','🔥 "Mereces una felicidad que no termine nunca."','🥰 "Tu sonrisa mejora el mundo."','🌼 "Tu alegría es contagiosa y preciosa."','🌈 "Cada día contigo se siente más bonito."','🌻 "Gracias por existir, luz bonita."','💛 "Hoy te abrazo fuerte con mi pensamiento."'],
+      triste:['Te quiero mucho mi niña <3','💙 "No tienes que ser fuerte todo el tiempo. Estoy aquí para ti."','🤍 "No cargues sola: déjame ayudarte."','✨ "Tu valor no depende de cómo te sientas hoy."','💫 "Las tormentas pasan, el sol vuelve."','🥰 "No estás sola; cuentas conmigo siempre."','🌿 "Está bien sentir; también es parte de sanar."','🔥 "Incluso en días grises, sigues brillando."','🌙 "Respira profundo: un paso a la vez."','🕊️ "Eres más fuerte de lo que crees."','🤗 "Te abrazo con todo mi cariño."','💛 "Aquí estoy, contigo."']};
+    const $=(s,el=document)=>el.querySelector(s);
+    const $$=(s,el=document)=>[...el.querySelectorAll(s)];
+    const shuffle=a=>Array.isArray(a)?a.slice().sort(()=>Math.random()-.5):[];
+    const store={get:(k,def)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch{return def}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+    const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+
+    /* ===================== Estado global ===================== */
+    let mood=store.get('mood',null);
+    let phrases=[]; let phraseIdx=0; let timer=null; let paused=false; let audioOn=store.get('audioOn',true);
+    let actx=null;
+
+    /* ===================== Audio ===================== */
+    function playChime(){
+      if(!audioOn) return;
+      try{
+        if(!actx) actx=new (window.AudioContext||window.webkitAudioContext)();
+        const t0=actx.currentTime; const o=actx.createOscillator(); const g=actx.createGain();
+        o.type='sine'; o.frequency.setValueAtTime(660,t0);
+        g.gain.setValueAtTime(0.0001,t0);
+        g.gain.exponentialRampToValueAtTime(0.08,t0+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001,t0+0.5);
+        o.connect(g).connect(actx.destination); o.start(t0); o.stop(t0+0.52);
+      }catch(e){}
+    }
+
+    /* ===================== Elementos ===================== */
+    const phraseEl=$('#phrase'); const bouquet=$('#bouquet');
+
+    /* ===================== Flor / ramo ===================== */
+    function createGerbera(color,{R='2.8rem',outer=28,inner=26,w='0.5rem',l='2.85rem',lInner='2.1rem'}={}){
+      const flower=document.createElement('div'); flower.className='flower'; flower.style.setProperty('--R',R);
+      const ring=document.createElement('div'); ring.className='ring'; ring.style.setProperty('--R',R);
+      for(let i=0;i<outer;i++){const wrap=document.createElement('div'); wrap.className='petal-wrap'; wrap.style.setProperty('--angle',`${(360/outer)*i}deg`);
+        const p=document.createElement('div'); p.className='petal'; p.style.setProperty('--w',w); p.style.setProperty('--l',l); p.style.setProperty('--R',R); p.style.background=`linear-gradient(${color.a},${color.b})`;
+        wrap.appendChild(p); ring.appendChild(wrap);}
+      for(let i=0;i<inner;i++){const wrap=document.createElement('div'); wrap.className='petal-wrap'; wrap.style.setProperty('--angle',`${(360/inner)*i+(180/inner)}deg`);
+        const p=document.createElement('div'); p.className='petal'; p.style.setProperty('--w','0.5rem'); p.style.setProperty('--l',lInner); p.style.setProperty('--R',`calc(${R} - 0.35rem)`); p.style.background=`linear-gradient(${color.a},${color.b})`;
+        wrap.appendChild(p); ring.appendChild(wrap);}
+      const center=document.createElement('div'); center.className='center'; center.style.setProperty('--core','1.6rem'); ring.appendChild(center);
+      flower.appendChild(ring); return flower;
+    }
+
+    const STEM_COUNT=15; const BOUQUET_SPREAD=1.6;
+    function generateStems(n){
+      const stems=[]; const R_BASE=3.4; const Rmax=R_BASE*BOUQUET_SPREAD;
+      for(let i=0;i<n;i++){
+        const angle=i*137.508; const t=(i+1)/n;
+        const radius=Math.pow(t,0.55)*Rmax*(0.9+Math.random()*0.6);
+        const x=(Math.sin(angle*Math.PI/180)*radius).toFixed(2)+'rem';
+        const h=(14+Math.random()*6).toFixed(2)+'rem';
+        const dur=(3.5+Math.random()*3).toFixed(2)+'s';
+        stems.push({h,x,dur});
+      }
+      stems.sort((a,b)=>parseFloat(b.h)-parseFloat(a.h));
+      return stems;
+    }
+    function renderBouquet(){
+      bouquet.replaceChildren();
+      const stems=generateStems(STEM_COUNT); const colors=buildPastelPalette(stems.length);
+      stems.forEach(({h,x,dur},i)=>{
+        const s=document.createElement('div'); s.className='stem';
+        s.style.setProperty('--h',h); s.style.setProperty('--x',x); s.style.setProperty('--dur',dur);
+        const color=colors[i%colors.length];
+        s.appendChild(createGerbera(color));
+        bouquet.appendChild(s);
+      });
+      if(paused){ $$('.stem',bouquet).forEach(el=>{el.style.animationPlayState='paused'; el.style.webkitAnimationPlayState='paused';}); }
+    }
+
+    /* ===================== Layout ===================== */
+    function fitLayout(){
+      const vh=window.innerHeight||document.documentElement.clientHeight;
+      const scale=clamp(vh/820,0.8,1.25);
+      bouquet.style.setProperty('--bouquet-scale',scale.toFixed(3));
+      const topVh=clamp(14+(vh-700)*(8/300),12,22);
+      phraseEl.style.top=`calc(env(safe-area-inset-top) + ${topVh}vh)`;
+    }
+    window.addEventListener('resize',fitLayout,{passive:true});
+    window.addEventListener('orientationchange',fitLayout);
+
+    /* ===================== Frases ===================== */
+    function cyclePhrase(){
+      if(!phrases.length) return;
+      phraseEl.setAttribute('aria-hidden','false');
+      phraseEl.textContent=phrases[phraseIdx];
+      playChime();
+      clearTimeout(timer);
+      timer=setTimeout(()=>{
+        phraseEl.setAttribute('aria-hidden','true');
+        phraseIdx=(phraseIdx+1)%phrases.length;
+        timer=setTimeout(cyclePhrase,1000);
+      },5000);
+    }
+
+    /* ===================== Estado de ánimo ===================== */
+    function setMood(next){
+      mood=next; store.set('mood',mood);
+      phrases=shuffle(PHRASES[mood]); phraseIdx=0;
+      renderBouquet(); bouquet.classList.add('is-visible'); bouquet.setAttribute('aria-hidden','false');
+      // no abrimos modal de estado, solo mostramos flores
+      cyclePhrase(); playChime(); fitLayout();
+    }
+
+    /* ===================== Toolbar y temas ===================== */
+    function openMoodModal(){ $('#mood-modal').hidden=false; $('#btn-feliz').focus(); }
+    function closeMoodModal(){ $('#mood-modal').hidden=true; }
+    document.getElementById('change-mood').addEventListener('click',openMoodModal);
+    document.getElementById('close-modal')?.addEventListener('click',closeMoodModal);
+    document.getElementById('mood-modal').addEventListener('click',e=>{ if(e.target.id==='mood-modal') closeMoodModal(); });
+    document.addEventListener('keydown',e=>{ if(!$('#mood-modal').hidden && e.key==='Escape') closeMoodModal(); });
+    document.addEventListener('click',e=>{ const btn=e.target.closest('[data-mood]'); if(btn){ setMood(btn.dataset.mood); closeMoodModal(); } });
+
+    document.getElementById('pause-anim').addEventListener('click',()=>{
+      paused=!paused; const state=paused?'paused':'running';
+      $$('.stem',bouquet).forEach(s=>{ s.style.animationPlayState=state; s.style.webkitAnimationPlayState=state; });
+      document.getElementById('pause-anim').textContent=paused?'Reanudar':'Pausar';
+    });
+    function applyTheme(night){
+      document.body.classList.toggle('theme-night',night);
+      document.getElementById('toggle-theme').textContent=night?'Modo día':'Modo noche';
+      store.set('themeNight',night);
+    }
+    function applyThemeOnLoad(){ applyTheme(store.get('themeNight',false)); }
+    applyThemeOnLoad();
+    document.getElementById('toggle-theme').addEventListener('click', () =>
+  applyTheme(!document.body.classList.contains('theme-night'))
+);
+    function refreshAudioBtn(){
+      const b=document.getElementById('toggle-audio'); if(!b) return;
+      const on=audioOn; b.textContent=on?'🔈':'🔇';
+      b.setAttribute('aria-label',on?'Desactivar sonido':'Activar sonido');
+      b.title=on?'Desactivar sonido':'Activar sonido';
+    }
+    refreshAudioBtn();
+    document.getElementById('toggle-audio').addEventListener('click',()=>{ audioOn=!audioOn; store.set('audioOn',audioOn); refreshAudioBtn(); });
+
+    /* ===================== Carta secreta (con pregunta y botones) ===================== */
+    const SECRET_BOOK={
+      // código válido: "2209"
+      "9e4067ac93c6febda554d724d453d78bf3e28a7742cdec57ee47c5c706fbe940":{
+        title:"Carta para ti",
+        bodyHtml: `
+          <p>Antes de conocerte solo pensaba que el enamorarse se logra solo por las acciones del otro, sin embargo, con solo mirarte me di cuenta de que no es así.</p>
+          <p>Quizá podamos atribuirle esto a un ente superior, al universo o simplemente a la casualidad, pero tantas casualidades seguidas hasta encontrarte son difíciles, por lo que me gusta pensar que estábamos destinados a encontrarnos en el momento exacto.</p>
+          <p>Que, a pesar de las peleas, de las discusiones siempre volvemos a estar juntos, y que solo estábamos a un beso de encontrarnos.</p>
+          <p>Siempre te he admirado, por quien eres y por lo que haces, y ahora más que nunca por todo lo que has logrado a pesar de las adversidades.</p>
+          <p>Y solo hay algo que quiero preguntarte…</p>
+          <h4 style="text-align:center;margin:1rem 0 1.25rem;">¿Quieres ser mi novia?</h4>
+          <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap">
+            <button class="btn" data-answer="yes">Sí 💘</button>
+            <button class="btn btn--ghost" data-answer="no">No 😅</button>
+          </div>
+        `
+      }
+    };
+
+    async function sha256Hex(input){
+      const data=new TextEncoder().encode(input);
+      const hash=await crypto.subtle.digest('SHA-256',data);
+      return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+    function showSecret(hash){
+      const rec=SECRET_BOOK[hash]; if(!rec) return;
+      document.getElementById('letter-title').textContent=rec.title||'Carta';
+      document.getElementById('letter-body').innerHTML=rec.bodyHtml||'';
+      const sec=document.getElementById('secret'); sec.hidden=false; sec.setAttribute('aria-hidden','false');
+      setTimeout(()=>{document.getElementById('close-letter').focus();},50);
+    }
+    function hideSecret(){ const sec=document.getElementById('secret'); sec.hidden=true; sec.setAttribute('aria-hidden','true'); }
+
+    // Modal del código (no se abre solo)
+    const codeModal=document.getElementById('code-modal');
+    const codeForm=document.getElementById('code-form');
+    const codeInput=document.getElementById('code-input');
+    const codeHint=document.getElementById('code-hint');
+    function openCodeModal(){ codeModal.hidden=false; codeInput.value=''; codeHint.textContent=''; setTimeout(()=>codeInput.focus(),50); }
+    function closeCodeModal(){ codeModal.hidden=true; }
+    document.getElementById('open-code').addEventListener('click',openCodeModal);
+    document.getElementById('close-code').addEventListener('click',closeCodeModal);
+    codeModal.addEventListener('click',e=>{ if(e.target===codeModal) closeCodeModal(); });
+    document.addEventListener('keydown',e=>{ if(!codeModal.hidden && e.key==='Escape') closeCodeModal(); });
+
+    // Rate-limit local
+    function getAttempts(){ const now=Date.now(); const st=store.get('codeAttempts',{count:0,until:0}); if(st.until && now>st.until) return{count:0,until:0}; return st; }
+    function setAttempts(st){ store.set('codeAttempts',st); }
+    codeForm.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const st=getAttempts();
+      if(st.until && Date.now()<st.until){
+        const secs=Math.ceil((st.until-Date.now())/1000);
+        codeHint.textContent=`Demasiados intentos. Intenta en ${secs}s.`;
+        codeInput.classList.add('shake'); setTimeout(()=>codeInput.classList.remove('shake'),500);
+        return;
+      }
+      const value=codeInput.value.trim(); if(!value) return;
+      try{
+        const hex=await sha256Hex(value);
+        if(SECRET_BOOK[hex]){ 
+          store.set('secretHash',hex); // solo recordar, no autoabrir al inicio
+          setAttempts({count:0,until:0});
+          closeCodeModal(); showSecret(hex);
+        } else {
+          const next={count:(st.count||0)+1,until:0}; if(next.count>=3){ next.count=0; next.until=Date.now()+60*1000; }
+          setAttempts(next); codeHint.textContent='Código incorrecto 😔';
+          codeInput.classList.add('shake'); setTimeout(()=>codeInput.classList.remove('shake'),500); codeInput.select();
+        }
+      }catch(err){ codeHint.textContent='Hubo un error. Intenta de nuevo.'; }
+    });
+
+    document.getElementById('close-letter').addEventListener('click',()=>{ hideSecret(); });
+
+    // Sin autodesbloqueo: la carta NO se abre sola aunque exista secretHash
+
+    // Acceso rápido con tecla L para abrir código
+    document.addEventListener('keydown',(e)=>{ if(e.key.toLowerCase()==='l' && (e.ctrlKey||e.altKey||e.metaKey)){ openCodeModal(); } });
+
+    /* ===================== Botones Sí / No y fuegos artificiales ===================== */
+    document.getElementById('letter-body').addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-answer]');
+      if(!btn) return;
+      const ans = btn.getAttribute('data-answer');
+      if(ans === 'yes'){
+        startFireworks();
+      }else if(ans === 'no'){
+        hideSecret();
+      }
+    });
+
+    // Fireworks (canvas) – compatible con iPhone
+    let fwCanvas, fwCtx, fwRAF, fwRunning = false, fwParticles = [];
+    function startFireworks(durationMs = 5500){
+      if(fwRunning) return;
+      fwRunning = true; fwParticles.length = 0;
+
+      fwCanvas = document.createElement('canvas');
+      fwCanvas.id = 'fireworks-canvas';
+      document.body.appendChild(fwCanvas);
+      fwCtx = fwCanvas.getContext('2d', { alpha: true });
+      resizeFW(); 
+      window.addEventListener('resize', resizeFW, { passive: true });
+
+      const launch = ()=>{
+        makeBurst(); 
+        if(fwRunning) setTimeout(launch, 400 + Math.random()*300);
+      };
+      launch();
+
+      setTimeout(()=>{ fwRunning=false; }, durationMs);
+
+      let last = performance.now();
+      const loop = (t)=>{
+        fwRAF = requestAnimationFrame(loop);
+        const dt = Math.min(0.05, (t - last)/1000); last = t;
+        drawFW(dt);
+        if(!fwRunning && fwParticles.length===0){ stopFireworks(true); }
+      };
+      fwRAF = requestAnimationFrame(loop);
+    }
+    function stopFireworks(showMsg=false){
+      try{ cancelAnimationFrame(fwRAF); }catch{}
+      window.removeEventListener('resize', resizeFW);
+      if(fwCanvas && fwCanvas.parentNode){
+        fwCanvas.style.transition = 'opacity .4s ease';
+        fwCanvas.style.opacity = '0';
+        setTimeout(()=> {
+          fwCanvas.remove();
+          if(showMsg) showYesMessage();   // Mensaje al terminar
+        }, 420);
+      }else if(showMsg){
+        showYesMessage();
+      }
+    }
+    function resizeFW(){
+      if(!fwCanvas) return;
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      fwCanvas.width  = Math.floor(innerWidth  * dpr);
+      fwCanvas.height = Math.floor(innerHeight * dpr);
+      fwCanvas.style.width  = '100vw';
+      fwCanvas.style.height = '100vh';
+      fwCtx.setTransform(dpr,0,0,dpr,0,0);
+      fwCtx.clearRect(0,0,innerWidth,innerHeight);
+    }
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+    function makeColor(){ 
+      const hues = [0, 25, 45, 200, 260, 300];
+      const h = hues[Math.floor(Math.random()*hues.length)];
+      return `hsl(${h} ${60+Math.random()*20}% ${55+Math.random()*15}%)`;
+    }
+    function makeBurst(){
+      const cx = innerWidth * rand(0.2, 0.8);
+      const cy = innerHeight * rand(0.15, 0.5);
+      const count = 80;
+      for(let i=0;i<count;i++){
+        const a = (i / count) * Math.PI*2 + rand(-0.05,0.05);
+        const sp = rand(180, 340);
+        fwParticles.push({
+          x: cx, y: cy,
+          vx: Math.cos(a)*sp, vy: Math.sin(a)*sp,
+          life: 1, decay: rand(0.012, 0.025),
+          size: rand(1.2, 2.2),
+          color: makeColor(),
+          glow: rand(0.5, 1),
+          flash: false
+        });
+      }
+      fwParticles.push({ x: cx, y: cy, vx:0, vy:0, life:0.35, decay:0.02, size:10, color:'#fff', glow:1.5, flash:true });
+    }
+    function drawFW(dt){
+      if(!fwCtx) return;
+      fwCtx.fillStyle = 'rgba(0,0,0,0.15)';
+      fwCtx.fillRect(0,0,innerWidth,innerHeight);
+
+      const g = 300;
+      for(let i=fwParticles.length-1;i>=0;i--){
+        const p = fwParticles[i];
+        p.life -= p.decay;
+        if(p.life<=0){ fwParticles.splice(i,1); continue; }
+        p.vy += g*dt;
+        p.x += p.vx*dt;
+        p.y += p.vy*dt;
+
+        fwCtx.save();
+        fwCtx.globalCompositeOperation = 'lighter';
+        fwCtx.globalAlpha = Math.max(0, p.life);
+        fwCtx.beginPath();
+        fwCtx.arc(p.x, p.y, p.size*(p.flash? (0.7 + p.life*1.3) : 1), 0, Math.PI*2);
+        fwCtx.fillStyle = p.color;
+        fwCtx.shadowColor = p.color;
+        fwCtx.shadowBlur = 12 * p.glow;
+        fwCtx.fill();
+        fwCtx.restore();
+      }
+    }
+
+    /* ===================== Mensaje “¡Dijo que sí!” ===================== */
+    function showYesMessage(text='¡Dijo que sí! 💍🥹', ms=3000){
+      if(document.getElementById('yes-toast')) return;
+      const wrap=document.createElement('div');
+      wrap.id='yes-toast';
+      const bubble=document.createElement('div');
+      bubble.className='bubble';
+      bubble.textContent=text;
+      wrap.appendChild(bubble);
+      document.body.appendChild(wrap);
+      setTimeout(()=>{
+        bubble.style.transition='opacity .45s ease, transform .45s ease';
+        bubble.style.opacity='0';
+        bubble.style.transform='translateY(-6px) scale(.98)';
+        setTimeout(()=> wrap.remove(), 460);
+      }, ms);
+    }
+
+    /* ===================== Inicio: flores desde el primer segundo ===================== */
+    // Theme recordado
+    applyThemeOnLoad();
+    // Mostrar flores inmediatamente (sin pedir código ni estado)
+    setMood(mood || 'feliz');
+    fitLayout();
+
+    /* ===================================================================
+       ▲ AÑADIDOS:
+       - Nueva carta 2109
+       - Pétalos amarillos al abrir esa carta (renombrados a .falling-petal)
+       - Limpieza de pétalos al cerrar
+       =================================================================== */
+
+    // Hash para "2109"
+    const HASH_2109 = "62fb418140a7ee4153da89e8b0f7c453e27db7e034d15502422c21f476cf4fbd";
+
+    // Agregar nueva entrada a SECRET_BOOK
+    SECRET_BOOK[HASH_2109] = {
+      title: "21 de septiembre — Flores amarillas",
+      bodyHtml: `
+        <p>21 de septiembre… Es raro pensar que este día se le considera especial en México, ya que bueno, es primavera en el sur y aquí inicia otoño jaja.</p>
+        <p>Pero también es una buena excusa para poder darte flores y verte, ver esa hermosa sonrisa que me hace tan feliz, es algo que me encanta como no tienes una idea, disfruto el tiempo a tu lado y aunque las cosas se pongan difíciles, siempre estaré para ti.</p>
+        <p>Te amo muchísimo.</p>
+        <p style="text-align:right;">Atte. E</p>
+      `
+    };
+
+    // Pétalos amarillos (crea y deja caer pétalos, luego se limpian solos)
+    function startPetals(){
+      for(let i=0;i<28;i++){
+        const petal=document.createElement('div');
+        petal.className='falling-petal';
+        petal.style.animationName='fallPetal';
+        petal.style.left=(Math.random()*100)+'vw';
+        petal.style.animationDuration=(4+Math.random()*3)+'s';
+        petal.style.animationDelay=(Math.random()*2.5)+'s';
+        petal.dataset.kind='petal2109';
+        document.body.appendChild(petal);
+        setTimeout(()=>petal.remove(), 8000);
+      }
+    }
+    function stopPetals(){
+      document.querySelectorAll('.falling-petal[data-kind="petal2109"]').forEach(n=>n.remove());
+    }
+
+    // Envolver showSecret para disparar pétalos con 2109
+    const __origShowSecret = showSecret;
+    showSecret = function(hash){
+      __origShowSecret(hash);
+      if(hash === HASH_2109){ startPetals(); }
+    };
+
+    // Al cerrar la carta, limpiar pétalos
+    document.getElementById('close-letter').addEventListener('click', stopPetals);
+
+    /* =================== FIN DE AÑADIDOS =================== */
+  </script>
 </body>
 </html>
