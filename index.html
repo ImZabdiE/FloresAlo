@@ -186,7 +186,7 @@
     }
     @keyframes toastIn{to{opacity:1; transform:translateY(0) scale(1)}}
 
-    /* ▼ CAMBIO: pétalos amarillos renombrados para no colisionar con .petal del ramo */
+    /* Pétalos amarillos (renombrados para no colisionar con .petal) */
     .falling-petal{
       position:fixed; top:-5vh;
       width:18px; height:12px;
@@ -199,11 +199,103 @@
     @keyframes fallPetal{
       to{ transform:translateY(110vh) rotate(360deg); opacity:0; }
     }
-    /* ▲ FIN CAMBIO */
+
+    /* ===== FX Gossip Girl (0401) ===== */
+    #gg-blast{
+      position:fixed; inset:0;
+      display:grid; place-items:start center;
+      padding-top:calc(env(safe-area-inset-top) + 10vh);
+      background:rgba(0,0,0,.22);
+      z-index:1400;
+    }
+    #gg-blast[hidden]{display:none}
+
+    .gg-card{
+      width:min(92vw,520px);
+      background:rgba(255,255,255,.94);
+      color:#111;
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:16px;
+      box-shadow:0 16px 42px rgba(0,0,0,.28);
+      overflow:hidden;
+      transform:translateY(10px) scale(.98);
+      opacity:0;
+      animation:ggPop .28s ease forwards;
+    }
+    .theme-night .gg-card{
+      background:rgba(20,26,40,.92);
+      color:#f4f6ff;
+      border-color:rgba(255,255,255,.12);
+      box-shadow:0 18px 50px rgba(0,0,0,.55);
+    }
+    @keyframes ggPop{to{transform:translateY(0) scale(1); opacity:1}}
+
+    .gg-top{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:.85rem 1rem;
+      background:rgba(0,0,0,.04);
+      border-bottom:1px solid rgba(0,0,0,.08);
+      font-weight:800;
+      letter-spacing:.4px;
+    }
+    .theme-night .gg-top{
+      background:rgba(255,255,255,.05);
+      border-bottom-color:rgba(255,255,255,.10);
+    }
+    .gg-tag{
+      font-size:.78rem;
+      opacity:.9;
+      text-transform:uppercase;
+    }
+    .gg-close{
+      border:0; background:transparent; color:inherit;
+      font-size:1.15rem; font-weight:900; cursor:pointer;
+      line-height:1;
+    }
+
+    .gg-body{padding:1rem 1rem 1.1rem}
+    .gg-line{
+      font-size:1.02rem;
+      line-height:1.55;
+      font-weight:700;
+      margin:.25rem 0;
+      overflow-wrap:anywhere;
+    }
+    .gg-cursor{
+      display:inline-block;
+      width:.55ch;
+      margin-left:.1ch;
+      animation:ggBlink .8s steps(1) infinite;
+      opacity:.8;
+    }
+    @keyframes ggBlink{50%{opacity:0}}
+    .gg-foot{
+      padding:.75rem 1rem 1rem;
+      border-top:1px solid rgba(0,0,0,.08);
+      font-weight:900;
+      letter-spacing:.25px;
+      opacity:.95;
+      text-align:right;
+    }
+    .theme-night .gg-foot{border-top-color:rgba(255,255,255,.10)}
+
+    .gg-shine{position:relative;}
+    .gg-shine::after{
+      content:"";
+      position:absolute; inset:-40% -60%;
+      background:linear-gradient(120deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%);
+      transform:translateX(-30%) rotate(10deg);
+      animation:ggShine 1.1s ease forwards;
+      pointer-events:none;
+    }
+    .theme-night .gg-shine::after{
+      background:linear-gradient(120deg, transparent 35%, rgba(255,255,255,.18) 50%, transparent 65%);
+    }
+    @keyframes ggShine{to{transform:translateX(35%) rotate(10deg)}}
   </style>
 </head>
 <body>
-  <!-- Modal de estado de ánimo (oculto de inicio) -->
+  <!-- Modal de estado de ánimo -->
   <div class="modal" id="mood-modal" role="dialog" aria-modal="true" aria-labelledby="mood-title" hidden>
     <div class="modal__panel">
       <button class="modal__close" id="close-modal" aria-label="Cerrar">✕</button>
@@ -215,7 +307,7 @@
     </div>
   </div>
 
-  <!-- Modal del código secreto (no se abre solo) -->
+  <!-- Modal del código -->
   <div class="modal" id="code-modal" role="dialog" aria-modal="true" aria-labelledby="code-title" hidden>
     <div class="modal__panel">
       <button class="modal__close" id="close-code" aria-label="Cerrar">✕</button>
@@ -249,7 +341,7 @@
     <button class="btn btn--ghost" id="toggle-theme" title="Cambiar tema">Modo noche</button>
     <button class="btn btn--ghost" id="open-code" title="Ingresar código">Código</button>
   </div>
-  
+
   <!-- Icono de sonido -->
   <button class="icon-btn sound-btn" id="toggle-audio" title="Activar/Desactivar sonido" aria-label="Activar/Desactivar sonido">🔈</button>
 
@@ -259,14 +351,43 @@
     const hsl=(h,s,l)=>`hsl(${h} ${s}% ${l}%)`;
     const jitter=(v,sp)=>v+(Math.random()*2-1)*sp;
     function makePastelGradient(t){const s1=Math.max(25,Math.min(70,jitter(t.s,4)));const s2=Math.max(25,Math.min(70,s1-6));const l1=Math.max(60,Math.min(90,jitter(t.l,3)));const l2=Math.max(65,Math.min(95,l1+6));return{a:hsl(t.h,s1,l1),b:hsl(t.h,s2,l2)}}
-    function buildPastelPalette(n){const tones=shuffle(TONES).slice(0,n);return tones.map(makePastelGradient)}
-    const PHRASES={feliz:['Te quiero mucho mi niña <3','💖 "Me encanta verte feliz, pero lo que más me gusta es saber que una persona tan increíble como tú merece toda esa felicidad y más."','🌟 "Tu energía ilumina todo a tu alrededor. No solo eres increíble, sino que haces que todo sea mejor con tu presencia."','😊 "Si la felicidad tuviera un rostro, seguramente se parecería mucho al tuyo. ¡Brillas con luz propia!"','✨ "Eres de esas personas que le dan color a la vida de los demás."','💫 "Ojalá pudieras verte con mis ojos: eres extraordinaria."','🔥 "Mereces una felicidad que no termine nunca."','🥰 "Tu sonrisa mejora el mundo."','🌼 "Tu alegría es contagiosa y preciosa."','🌈 "Cada día contigo se siente más bonito."','🌻 "Gracias por existir, luz bonita."','💛 "Hoy te abrazo fuerte con mi pensamiento."'],
-      triste:['Te quiero mucho mi niña <3','💙 "No tienes que ser fuerte todo el tiempo. Estoy aquí para ti."','🤍 "No cargues sola: déjame ayudarte."','✨ "Tu valor no depende de cómo te sientas hoy."','💫 "Las tormentas pasan, el sol vuelve."','🥰 "No estás sola; cuentas conmigo siempre."','🌿 "Está bien sentir; también es parte de sanar."','🔥 "Incluso en días grises, sigues brillando."','🌙 "Respira profundo: un paso a la vez."','🕊️ "Eres más fuerte de lo que crees."','🤗 "Te abrazo con todo mi cariño."','💛 "Aquí estoy, contigo."']};
     const $=(s,el=document)=>el.querySelector(s);
     const $$=(s,el=document)=>[...el.querySelectorAll(s)];
     const shuffle=a=>Array.isArray(a)?a.slice().sort(()=>Math.random()-.5):[];
     const store={get:(k,def)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch{return def}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
     const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+    function buildPastelPalette(n){const tones=shuffle(TONES).slice(0,n);return tones.map(makePastelGradient)}
+
+    const PHRASES={
+      feliz:[
+        'Te quiero mucho mi niña <3',
+        '💖 "Me encanta verte feliz, pero lo que más me gusta es saber que una persona tan increíble como tú merece toda esa felicidad y más."',
+        '🌟 "Tu energía ilumina todo a tu alrededor. No solo eres increíble, sino que haces que todo sea mejor con tu presencia."',
+        '😊 "Si la felicidad tuviera un rostro, seguramente se parecería mucho al tuyo. ¡Brillas con luz propia!"',
+        '✨ "Eres de esas personas que le dan color a la vida de los demás."',
+        '💫 "Ojalá pudieras verte con mis ojos: eres extraordinaria."',
+        '🔥 "Mereces una felicidad que no termine nunca."',
+        '🥰 "Tu sonrisa mejora el mundo."',
+        '🌼 "Tu alegría es contagiosa y preciosa."',
+        '🌈 "Cada día contigo se siente más bonito."',
+        '🌻 "Gracias por existir, luz bonita."',
+        '💛 "Hoy te abrazo fuerte con mi pensamiento."'
+      ],
+      triste:[
+        'Te quiero mucho mi niña <3',
+        '💙 "No tienes que ser fuerte todo el tiempo. Estoy aquí para ti."',
+        '🤍 "No cargues sola: déjame ayudarte."',
+        '✨ "Tu valor no depende de cómo te sientas hoy."',
+        '💫 "Las tormentas pasan, el sol vuelve."',
+        '🥰 "No estás sola; cuentas conmigo siempre."',
+        '🌿 "Está bien sentir; también es parte de sanar."',
+        '🔥 "Incluso en días grises, sigues brillando."',
+        '🌙 "Respira profundo: un paso a la vez."',
+        '🕊️ "Eres más fuerte de lo que crees."',
+        '🤗 "Te abrazo con todo mi cariño."',
+        '💛 "Aquí estoy, contigo."'
+      ]
+    };
 
     /* ===================== Estado global ===================== */
     let mood=store.get('mood',null);
@@ -288,23 +409,34 @@
     }
 
     /* ===================== Elementos ===================== */
-    const phraseEl=$('#phrase'); const bouquet=$('#bouquet');
+    const phraseEl=$('#phrase');
+    const bouquet=$('#bouquet');
 
     /* ===================== Flor / ramo ===================== */
     function createGerbera(color,{R='2.8rem',outer=28,inner=26,w='0.5rem',l='2.85rem',lInner='2.1rem'}={}){
       const flower=document.createElement('div'); flower.className='flower'; flower.style.setProperty('--R',R);
       const ring=document.createElement('div'); ring.className='ring'; ring.style.setProperty('--R',R);
-      for(let i=0;i<outer;i++){const wrap=document.createElement('div'); wrap.className='petal-wrap'; wrap.style.setProperty('--angle',`${(360/outer)*i}deg`);
-        const p=document.createElement('div'); p.className='petal'; p.style.setProperty('--w',w); p.style.setProperty('--l',l); p.style.setProperty('--R',R); p.style.background=`linear-gradient(${color.a},${color.b})`;
-        wrap.appendChild(p); ring.appendChild(wrap);}
-      for(let i=0;i<inner;i++){const wrap=document.createElement('div'); wrap.className='petal-wrap'; wrap.style.setProperty('--angle',`${(360/inner)*i+(180/inner)}deg`);
-        const p=document.createElement('div'); p.className='petal'; p.style.setProperty('--w','0.5rem'); p.style.setProperty('--l',lInner); p.style.setProperty('--R',`calc(${R} - 0.35rem)`); p.style.background=`linear-gradient(${color.a},${color.b})`;
-        wrap.appendChild(p); ring.appendChild(wrap);}
+      for(let i=0;i<outer;i++){
+        const wrap=document.createElement('div'); wrap.className='petal-wrap'; wrap.style.setProperty('--angle',`${(360/outer)*i}deg`);
+        const p=document.createElement('div'); p.className='petal';
+        p.style.setProperty('--w',w); p.style.setProperty('--l',l); p.style.setProperty('--R',R);
+        p.style.background=`linear-gradient(${color.a},${color.b})`;
+        wrap.appendChild(p); ring.appendChild(wrap);
+      }
+      for(let i=0;i<inner;i++){
+        const wrap=document.createElement('div'); wrap.className='petal-wrap'; wrap.style.setProperty('--angle',`${(360/inner)*i+(180/inner)}deg`);
+        const p=document.createElement('div'); p.className='petal';
+        p.style.setProperty('--w','0.5rem'); p.style.setProperty('--l',lInner); p.style.setProperty('--R',`calc(${R} - 0.35rem)`);
+        p.style.background=`linear-gradient(${color.a},${color.b})`;
+        wrap.appendChild(p); ring.appendChild(wrap);
+      }
       const center=document.createElement('div'); center.className='center'; center.style.setProperty('--core','1.6rem'); ring.appendChild(center);
       flower.appendChild(ring); return flower;
     }
 
-    const STEM_COUNT=15; const BOUQUET_SPREAD=1.6;
+    const STEM_COUNT=15;
+    const BOUQUET_SPREAD=1.6;
+
     function generateStems(n){
       const stems=[]; const R_BASE=3.4; const Rmax=R_BASE*BOUQUET_SPREAD;
       for(let i=0;i<n;i++){
@@ -318,17 +450,26 @@
       stems.sort((a,b)=>parseFloat(b.h)-parseFloat(a.h));
       return stems;
     }
+
     function renderBouquet(){
       bouquet.replaceChildren();
-      const stems=generateStems(STEM_COUNT); const colors=buildPastelPalette(stems.length);
+      const stems=generateStems(STEM_COUNT);
+      const colors=buildPastelPalette(stems.length);
       stems.forEach(({h,x,dur},i)=>{
         const s=document.createElement('div'); s.className='stem';
-        s.style.setProperty('--h',h); s.style.setProperty('--x',x); s.style.setProperty('--dur',dur);
+        s.style.setProperty('--h',h);
+        s.style.setProperty('--x',x);
+        s.style.setProperty('--dur',dur);
         const color=colors[i%colors.length];
         s.appendChild(createGerbera(color));
         bouquet.appendChild(s);
       });
-      if(paused){ $$('.stem',bouquet).forEach(el=>{el.style.animationPlayState='paused'; el.style.webkitAnimationPlayState='paused';}); }
+      if(paused){
+        $$('.stem',bouquet).forEach(el=>{
+          el.style.animationPlayState='paused';
+          el.style.webkitAnimationPlayState='paused';
+        });
+      }
     }
 
     /* ===================== Layout ===================== */
@@ -360,9 +501,12 @@
     function setMood(next){
       mood=next; store.set('mood',mood);
       phrases=shuffle(PHRASES[mood]); phraseIdx=0;
-      renderBouquet(); bouquet.classList.add('is-visible'); bouquet.setAttribute('aria-hidden','false');
-      // no abrimos modal de estado, solo mostramos flores
-      cyclePhrase(); playChime(); fitLayout();
+      renderBouquet();
+      bouquet.classList.add('is-visible');
+      bouquet.setAttribute('aria-hidden','false');
+      cyclePhrase();
+      playChime();
+      fitLayout();
     }
 
     /* ===================== Toolbar y temas ===================== */
@@ -372,13 +516,21 @@
     document.getElementById('close-modal')?.addEventListener('click',closeMoodModal);
     document.getElementById('mood-modal').addEventListener('click',e=>{ if(e.target.id==='mood-modal') closeMoodModal(); });
     document.addEventListener('keydown',e=>{ if(!$('#mood-modal').hidden && e.key==='Escape') closeMoodModal(); });
-    document.addEventListener('click',e=>{ const btn=e.target.closest('[data-mood]'); if(btn){ setMood(btn.dataset.mood); closeMoodModal(); } });
+    document.addEventListener('click',e=>{
+      const btn=e.target.closest('[data-mood]');
+      if(btn){ setMood(btn.dataset.mood); closeMoodModal(); }
+    });
 
     document.getElementById('pause-anim').addEventListener('click',()=>{
-      paused=!paused; const state=paused?'paused':'running';
-      $$('.stem',bouquet).forEach(s=>{ s.style.animationPlayState=state; s.style.webkitAnimationPlayState=state; });
+      paused=!paused;
+      const state=paused?'paused':'running';
+      $$('.stem',bouquet).forEach(s=>{
+        s.style.animationPlayState=state;
+        s.style.webkitAnimationPlayState=state;
+      });
       document.getElementById('pause-anim').textContent=paused?'Reanudar':'Pausar';
     });
+
     function applyTheme(night){
       document.body.classList.toggle('theme-night',night);
       document.getElementById('toggle-theme').textContent=night?'Modo día':'Modo noche';
@@ -386,21 +538,25 @@
     }
     function applyThemeOnLoad(){ applyTheme(store.get('themeNight',false)); }
     applyThemeOnLoad();
-    document.getElementById('toggle-theme').addEventListener('click', () =>
-  applyTheme(!document.body.classList.contains('theme-night'))
-);
+    document.getElementById('toggle-theme').addEventListener('click',()=>applyTheme(!document.body.classList.contains('theme-night')));
+
     function refreshAudioBtn(){
       const b=document.getElementById('toggle-audio'); if(!b) return;
-      const on=audioOn; b.textContent=on?'🔈':'🔇';
+      const on=audioOn;
+      b.textContent=on?'🔈':'🔇';
       b.setAttribute('aria-label',on?'Desactivar sonido':'Activar sonido');
       b.title=on?'Desactivar sonido':'Activar sonido';
     }
     refreshAudioBtn();
-    document.getElementById('toggle-audio').addEventListener('click',()=>{ audioOn=!audioOn; store.set('audioOn',audioOn); refreshAudioBtn(); });
+    document.getElementById('toggle-audio').addEventListener('click',()=>{
+      audioOn=!audioOn;
+      store.set('audioOn',audioOn);
+      refreshAudioBtn();
+    });
 
-    /* ===================== Carta secreta (con pregunta y botones) ===================== */
+    /* ===================== Carta secreta ===================== */
     const SECRET_BOOK={
-      // código válido: "2209"
+      // PIN: 2209
       "9e4067ac93c6febda554d724d453d78bf3e28a7742cdec57ee47c5c706fbe940":{
         title:"Carta para ti",
         bodyHtml: `
@@ -423,30 +579,48 @@
       const hash=await crypto.subtle.digest('SHA-256',data);
       return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
     }
+
     function showSecret(hash){
       const rec=SECRET_BOOK[hash]; if(!rec) return;
       document.getElementById('letter-title').textContent=rec.title||'Carta';
       document.getElementById('letter-body').innerHTML=rec.bodyHtml||'';
-      const sec=document.getElementById('secret'); sec.hidden=false; sec.setAttribute('aria-hidden','false');
-      setTimeout(()=>{document.getElementById('close-letter').focus();},50);
+      const sec=document.getElementById('secret');
+      sec.hidden=false; sec.setAttribute('aria-hidden','false');
+      setTimeout(()=>{ document.getElementById('close-letter').focus(); },50);
     }
-    function hideSecret(){ const sec=document.getElementById('secret'); sec.hidden=true; sec.setAttribute('aria-hidden','true'); }
 
-    // Modal del código (no se abre solo)
+    function hideSecret(){
+      const sec=document.getElementById('secret');
+      sec.hidden=true; sec.setAttribute('aria-hidden','true');
+    }
+
+    /* ===================== Modal del código ===================== */
     const codeModal=document.getElementById('code-modal');
     const codeForm=document.getElementById('code-form');
     const codeInput=document.getElementById('code-input');
     const codeHint=document.getElementById('code-hint');
-    function openCodeModal(){ codeModal.hidden=false; codeInput.value=''; codeHint.textContent=''; setTimeout(()=>codeInput.focus(),50); }
+
+    function openCodeModal(){
+      codeModal.hidden=false;
+      codeInput.value='';
+      codeHint.textContent='';
+      setTimeout(()=>codeInput.focus(),50);
+    }
     function closeCodeModal(){ codeModal.hidden=true; }
+
     document.getElementById('open-code').addEventListener('click',openCodeModal);
     document.getElementById('close-code').addEventListener('click',closeCodeModal);
     codeModal.addEventListener('click',e=>{ if(e.target===codeModal) closeCodeModal(); });
     document.addEventListener('keydown',e=>{ if(!codeModal.hidden && e.key==='Escape') closeCodeModal(); });
 
-    // Rate-limit local
-    function getAttempts(){ const now=Date.now(); const st=store.get('codeAttempts',{count:0,until:0}); if(st.until && now>st.until) return{count:0,until:0}; return st; }
+    function getAttempts(){
+      const now=Date.now();
+      const st=store.get('codeAttempts',{count:0,until:0});
+      if(st.until && now>st.until) return {count:0,until:0};
+      return st;
+    }
     function setAttempts(st){ store.set('codeAttempts',st); }
+
     codeForm.addEventListener('submit',async e=>{
       e.preventDefault();
       const st=getAttempts();
@@ -456,184 +630,186 @@
         codeInput.classList.add('shake'); setTimeout(()=>codeInput.classList.remove('shake'),500);
         return;
       }
-      const value=codeInput.value.trim(); if(!value) return;
+      const value=codeInput.value.trim();
+      if(!value) return;
+
       try{
         const hex=await sha256Hex(value);
-        if(SECRET_BOOK[hex]){ 
-          store.set('secretHash',hex); // solo recordar, no autoabrir al inicio
+        if(SECRET_BOOK[hex]){
+          store.set('secretHash',hex); // solo recordar, no autoabrir
           setAttempts({count:0,until:0});
-          closeCodeModal(); showSecret(hex);
+          closeCodeModal();
+          showSecret(hex);
         } else {
-          const next={count:(st.count||0)+1,until:0}; if(next.count>=3){ next.count=0; next.until=Date.now()+60*1000; }
-          setAttempts(next); codeHint.textContent='Código incorrecto 😔';
-          codeInput.classList.add('shake'); setTimeout(()=>codeInput.classList.remove('shake'),500); codeInput.select();
+          const next={count:(st.count||0)+1,until:0};
+          if(next.count>=3){ next.count=0; next.until=Date.now()+60*1000; }
+          setAttempts(next);
+          codeHint.textContent='Código incorrecto 😔';
+          codeInput.classList.add('shake'); setTimeout(()=>codeInput.classList.remove('shake'),500);
+          codeInput.select();
         }
-      }catch(err){ codeHint.textContent='Hubo un error. Intenta de nuevo.'; }
-    });
-
-    document.getElementById('close-letter').addEventListener('click',()=>{ hideSecret(); });
-
-    // Sin autodesbloqueo: la carta NO se abre sola aunque exista secretHash
-
-    // Acceso rápido con tecla L para abrir código
-    document.addEventListener('keydown',(e)=>{ if(e.key.toLowerCase()==='l' && (e.ctrlKey||e.altKey||e.metaKey)){ openCodeModal(); } });
-
-    /* ===================== Botones Sí / No y fuegos artificiales ===================== */
-    document.getElementById('letter-body').addEventListener('click', (e)=>{
-      const btn = e.target.closest('[data-answer]');
-      if(!btn) return;
-      const ans = btn.getAttribute('data-answer');
-      if(ans === 'yes'){
-        startFireworks();
-      }else if(ans === 'no'){
-        hideSecret();
+      }catch(err){
+        codeHint.textContent='Hubo un error. Intenta de nuevo.';
       }
     });
 
-    // Fireworks (canvas) – compatible con iPhone
-    let fwCanvas, fwCtx, fwRAF, fwRunning = false, fwParticles = [];
-    function startFireworks(durationMs = 5500){
+    /* Cerrar carta (X): además limpia efectos */
+    function closeLetter(){
+      hideSecret();
+      stopPetals();
+      stopGossipFx();
+    }
+    document.getElementById('close-letter').addEventListener('click', closeLetter);
+
+    /* Acceso rápido: Ctrl/Alt/Meta + L abre código */
+    document.addEventListener('keydown',(e)=>{
+      if(e.key.toLowerCase()==='l' && (e.ctrlKey||e.altKey||e.metaKey)) openCodeModal();
+    });
+
+    /* ===================== Sí/No y fuegos artificiales ===================== */
+    document.getElementById('letter-body').addEventListener('click',(e)=>{
+      const btn=e.target.closest('[data-answer]');
+      if(!btn) return;
+      const ans=btn.getAttribute('data-answer');
+      if(ans==='yes') startFireworks();
+      else if(ans==='no') closeLetter();
+    });
+
+    let fwCanvas, fwCtx, fwRAF, fwRunning=false, fwParticles=[];
+    function startFireworks(durationMs=5500){
       if(fwRunning) return;
-      fwRunning = true; fwParticles.length = 0;
+      fwRunning=true; fwParticles.length=0;
 
-      fwCanvas = document.createElement('canvas');
-      fwCanvas.id = 'fireworks-canvas';
+      fwCanvas=document.createElement('canvas');
+      fwCanvas.id='fireworks-canvas';
       document.body.appendChild(fwCanvas);
-      fwCtx = fwCanvas.getContext('2d', { alpha: true });
-      resizeFW(); 
-      window.addEventListener('resize', resizeFW, { passive: true });
+      fwCtx=fwCanvas.getContext('2d',{alpha:true});
+      resizeFW();
+      window.addEventListener('resize',resizeFW,{passive:true});
 
-      const launch = ()=>{
-        makeBurst(); 
-        if(fwRunning) setTimeout(launch, 400 + Math.random()*300);
+      const launch=()=>{
+        makeBurst();
+        if(fwRunning) setTimeout(launch,400+Math.random()*300);
       };
       launch();
 
-      setTimeout(()=>{ fwRunning=false; }, durationMs);
+      setTimeout(()=>{ fwRunning=false; },durationMs);
 
-      let last = performance.now();
-      const loop = (t)=>{
-        fwRAF = requestAnimationFrame(loop);
-        const dt = Math.min(0.05, (t - last)/1000); last = t;
+      let last=performance.now();
+      const loop=(t)=>{
+        fwRAF=requestAnimationFrame(loop);
+        const dt=Math.min(0.05,(t-last)/1000); last=t;
         drawFW(dt);
-        if(!fwRunning && fwParticles.length===0){ stopFireworks(true); }
+        if(!fwRunning && fwParticles.length===0) stopFireworks(true);
       };
-      fwRAF = requestAnimationFrame(loop);
+      fwRAF=requestAnimationFrame(loop);
     }
+
     function stopFireworks(showMsg=false){
       try{ cancelAnimationFrame(fwRAF); }catch{}
-      window.removeEventListener('resize', resizeFW);
+      window.removeEventListener('resize',resizeFW);
       if(fwCanvas && fwCanvas.parentNode){
-        fwCanvas.style.transition = 'opacity .4s ease';
-        fwCanvas.style.opacity = '0';
-        setTimeout(()=> {
+        fwCanvas.style.transition='opacity .4s ease';
+        fwCanvas.style.opacity='0';
+        setTimeout(()=>{
           fwCanvas.remove();
-          if(showMsg) showYesMessage();   // Mensaje al terminar
-        }, 420);
-      }else if(showMsg){
+          if(showMsg) showYesMessage();
+        },420);
+      } else if(showMsg){
         showYesMessage();
       }
     }
+
     function resizeFW(){
       if(!fwCanvas) return;
-      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-      fwCanvas.width  = Math.floor(innerWidth  * dpr);
-      fwCanvas.height = Math.floor(innerHeight * dpr);
-      fwCanvas.style.width  = '100vw';
-      fwCanvas.style.height = '100vh';
+      const dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+      fwCanvas.width=Math.floor(innerWidth*dpr);
+      fwCanvas.height=Math.floor(innerHeight*dpr);
+      fwCanvas.style.width='100vw';
+      fwCanvas.style.height='100vh';
       fwCtx.setTransform(dpr,0,0,dpr,0,0);
       fwCtx.clearRect(0,0,innerWidth,innerHeight);
     }
+
     function rand(min,max){ return Math.random()*(max-min)+min; }
-    function makeColor(){ 
-      const hues = [0, 25, 45, 200, 260, 300];
-      const h = hues[Math.floor(Math.random()*hues.length)];
+    function makeColor(){
+      const hues=[0,25,45,200,260,300];
+      const h=hues[Math.floor(Math.random()*hues.length)];
       return `hsl(${h} ${60+Math.random()*20}% ${55+Math.random()*15}%)`;
     }
+
     function makeBurst(){
-      const cx = innerWidth * rand(0.2, 0.8);
-      const cy = innerHeight * rand(0.15, 0.5);
-      const count = 80;
+      const cx=innerWidth*rand(0.2,0.8);
+      const cy=innerHeight*rand(0.15,0.5);
+      const count=80;
       for(let i=0;i<count;i++){
-        const a = (i / count) * Math.PI*2 + rand(-0.05,0.05);
-        const sp = rand(180, 340);
+        const a=(i/count)*Math.PI*2+rand(-0.05,0.05);
+        const sp=rand(180,340);
         fwParticles.push({
-          x: cx, y: cy,
-          vx: Math.cos(a)*sp, vy: Math.sin(a)*sp,
-          life: 1, decay: rand(0.012, 0.025),
-          size: rand(1.2, 2.2),
-          color: makeColor(),
-          glow: rand(0.5, 1),
-          flash: false
+          x:cx,y:cy,
+          vx:Math.cos(a)*sp, vy:Math.sin(a)*sp,
+          life:1, decay:rand(0.012,0.025),
+          size:rand(1.2,2.2),
+          color:makeColor(),
+          glow:rand(0.5,1),
+          flash:false
         });
       }
-      fwParticles.push({ x: cx, y: cy, vx:0, vy:0, life:0.35, decay:0.02, size:10, color:'#fff', glow:1.5, flash:true });
+      fwParticles.push({x:cx,y:cy,vx:0,vy:0,life:0.35,decay:0.02,size:10,color:'#fff',glow:1.5,flash:true});
     }
+
     function drawFW(dt){
       if(!fwCtx) return;
-      fwCtx.fillStyle = 'rgba(0,0,0,0.15)';
+      fwCtx.fillStyle='rgba(0,0,0,0.15)';
       fwCtx.fillRect(0,0,innerWidth,innerHeight);
 
-      const g = 300;
+      const g=300;
       for(let i=fwParticles.length-1;i>=0;i--){
-        const p = fwParticles[i];
-        p.life -= p.decay;
+        const p=fwParticles[i];
+        p.life-=p.decay;
         if(p.life<=0){ fwParticles.splice(i,1); continue; }
-        p.vy += g*dt;
-        p.x += p.vx*dt;
-        p.y += p.vy*dt;
+        p.vy+=g*dt;
+        p.x+=p.vx*dt;
+        p.y+=p.vy*dt;
 
         fwCtx.save();
-        fwCtx.globalCompositeOperation = 'lighter';
-        fwCtx.globalAlpha = Math.max(0, p.life);
+        fwCtx.globalCompositeOperation='lighter';
+        fwCtx.globalAlpha=Math.max(0,p.life);
         fwCtx.beginPath();
-        fwCtx.arc(p.x, p.y, p.size*(p.flash? (0.7 + p.life*1.3) : 1), 0, Math.PI*2);
-        fwCtx.fillStyle = p.color;
-        fwCtx.shadowColor = p.color;
-        fwCtx.shadowBlur = 12 * p.glow;
+        fwCtx.arc(p.x,p.y,p.size*(p.flash?(0.7+p.life*1.3):1),0,Math.PI*2);
+        fwCtx.fillStyle=p.color;
+        fwCtx.shadowColor=p.color;
+        fwCtx.shadowBlur=12*p.glow;
         fwCtx.fill();
         fwCtx.restore();
       }
     }
 
-    /* ===================== Mensaje “¡Dijo que sí!” ===================== */
     function showYesMessage(text='¡Dijo que sí! 💍🥹', ms=3000){
       if(document.getElementById('yes-toast')) return;
-      const wrap=document.createElement('div');
-      wrap.id='yes-toast';
-      const bubble=document.createElement('div');
-      bubble.className='bubble';
-      bubble.textContent=text;
-      wrap.appendChild(bubble);
-      document.body.appendChild(wrap);
+      const wrap=document.createElement('div'); wrap.id='yes-toast';
+      const bubble=document.createElement('div'); bubble.className='bubble'; bubble.textContent=text;
+      wrap.appendChild(bubble); document.body.appendChild(wrap);
       setTimeout(()=>{
         bubble.style.transition='opacity .45s ease, transform .45s ease';
         bubble.style.opacity='0';
         bubble.style.transform='translateY(-6px) scale(.98)';
-        setTimeout(()=> wrap.remove(), 460);
-      }, ms);
+        setTimeout(()=>wrap.remove(),460);
+      },ms);
     }
 
-    /* ===================== Inicio: flores desde el primer segundo ===================== */
-    // Theme recordado
-    applyThemeOnLoad();
-    // Mostrar flores inmediatamente (sin pedir código ni estado)
+    /* ===================== INICIO: flores de inmediato ===================== */
     setMood(mood || 'feliz');
     fitLayout();
 
     /* ===================================================================
-       ▲ AÑADIDOS:
-       - Nueva carta 2109
-       - Pétalos amarillos al abrir esa carta (renombrados a .falling-petal)
-       - Limpieza de pétalos al cerrar
+       AÑADIDOS: 2109 (pétalos) + 0401 (Gossip Blast antes de la carta)
        =================================================================== */
 
-    // Hash para "2109"
-    const HASH_2109 = "62fb418140a7ee4153da89e8b0f7c453e27db7e034d15502422c21f476cf4fbd";
-
-    // Agregar nueva entrada a SECRET_BOOK
-    SECRET_BOOK[HASH_2109] = {
-      title: "21 de septiembre — Flores amarillas",
+    /* ===== 2109 ===== */
+    const HASH_2109="62fb418140a7ee4153da89e8b0f7c453e27db7e034d15502422c21f476cf4fbd";
+    SECRET_BOOK[HASH_2109]={
+      title:"21 de septiembre — Flores amarillas",
       bodyHtml: `
         <p>21 de septiembre… Es raro pensar que este día se le considera especial en México, ya que bueno, es primavera en el sur y aquí inicia otoño jaja.</p>
         <p>Pero también es una buena excusa para poder darte flores y verte, ver esa hermosa sonrisa que me hace tan feliz, es algo que me encanta como no tienes una idea, disfruto el tiempo a tu lado y aunque las cosas se pongan difíciles, siempre estaré para ti.</p>
@@ -642,35 +818,172 @@
       `
     };
 
-    // Pétalos amarillos (crea y deja caer pétalos, luego se limpian solos)
     function startPetals(){
       for(let i=0;i<28;i++){
         const petal=document.createElement('div');
         petal.className='falling-petal';
-        petal.style.animationName='fallPetal';
         petal.style.left=(Math.random()*100)+'vw';
         petal.style.animationDuration=(4+Math.random()*3)+'s';
         petal.style.animationDelay=(Math.random()*2.5)+'s';
         petal.dataset.kind='petal2109';
         document.body.appendChild(petal);
-        setTimeout(()=>petal.remove(), 8000);
+        setTimeout(()=>petal.remove(),8000);
       }
     }
     function stopPetals(){
       document.querySelectorAll('.falling-petal[data-kind="petal2109"]').forEach(n=>n.remove());
     }
 
-    // Envolver showSecret para disparar pétalos con 2109
+    /* ===== 0401 ===== */
+    const HASH_0401="12b408838e33f12bf8886792e6d44de0d9623e2bbf833b70f9f2e13fdf802706";
+    SECRET_BOOK[HASH_0401] = {
+  title: "04 de enero — Birthday Blast",
+  bodyHtml: `
+    <p><strong>¡Feliz cumpleaños al amor de mi vida!</strong></p>
+
+    <p>Hoy cumple años la persona que más he llegado a amar en tan poco tiempo. Una chica tan linda que, con solo verla, me transmite una paz que jamás imaginé sentir.</p>
+
+    <p>Un año más que celebras; un año en el que pasó de todo. Hubo momentos que quizá no salieron como esperábamos, pero también muchos otros que sí, y que nos hicieron crecer.</p>
+
+    <p>Hoy inicia un nuevo año: nuevas aventuras, nuevos aprendizajes y grandes logros que estoy seguro alcanzarás. Eres una persona increíble, aunque a veces no lo veas. Eres la mejor novia que alguien podría desear y, sobre todo, una gran mujer.</p>
+
+    <p>Te amo. Te amé desde antes y te seguiré amando siempre.</p>
+
+    <p style="text-align:right; font-style:italic;">Atte. E</p>
+  `
+};
+
+    /* Gossip FX: overlay primero, luego carta */
+    let ggBlastEl=null;
+    let ggTimers=[];
+    function ggClearTimers(){
+      ggTimers.forEach(t=>{ try{clearTimeout(t)}catch{} });
+      ggTimers=[];
+    }
+    function stopGossipFx(){
+      ggClearTimers();
+      if(ggBlastEl && ggBlastEl.parentNode) ggBlastEl.remove();
+      ggBlastEl=null;
+    }
+
+    function startGossipFx(onDone){
+      stopGossipFx();
+
+      ggBlastEl=document.createElement('div');
+      ggBlastEl.id='gg-blast';
+
+      const card=document.createElement('div');
+      card.className='gg-card gg-shine';
+
+      const top=document.createElement('div');
+      top.className='gg-top';
+      top.innerHTML=`
+        <div class="gg-tag">Gossip Girl • Blast</div>
+        <button class="gg-close" aria-label="Cerrar">✕</button>
+      `;
+
+      const body=document.createElement('div');
+      body.className='gg-body';
+      body.innerHTML=`
+        <div class="gg-line" id="gg-l1"></div>
+        <div class="gg-line" id="gg-l2"></div>
+        <div class="gg-line" id="gg-l3"></div>
+      `;
+
+      const foot=document.createElement('div');
+      foot.className='gg-foot';
+      foot.textContent="You know you love me. XOXO.";
+
+      card.appendChild(top);
+      card.appendChild(body);
+      card.appendChild(foot);
+      ggBlastEl.appendChild(card);
+      document.body.appendChild(ggBlastEl);
+
+      let doneCalled=false;
+      const doneOnce=()=>{
+        if(doneCalled) return;
+        doneCalled=true;
+        if(typeof onDone==='function') onDone();
+      };
+
+      const closeBtn=top.querySelector('.gg-close');
+      const onKey=(e)=>{ if(e.key==='Escape') close(); };
+
+      const close=()=>{
+        if(!ggBlastEl) return;
+        ggBlastEl.style.transition='opacity .25s ease, transform .25s ease';
+        ggBlastEl.style.opacity='0';
+        ggBlastEl.style.transform='translateY(-4px)';
+        ggTimers.push(setTimeout(()=>{
+          stopGossipFx();
+          document.removeEventListener('keydown', onKey);
+          doneOnce();
+        },260));
+      };
+
+      closeBtn.addEventListener('click', close);
+      ggBlastEl.addEventListener('click',(e)=>{ if(e.target===ggBlastEl) close(); });
+      document.addEventListener('keydown', onKey);
+
+      const L1="Spotted: Hoy cumples años.";
+      const L2="En el Upper East Side, esto se celebra como se debe.";
+      const L3="Feliz cumpleaños, reina.";
+
+      const l1=document.getElementById('gg-l1');
+      const l2=document.getElementById('gg-l2');
+      const l3=document.getElementById('gg-l3');
+
+      function typeLine(el,text,speed=26){
+        return new Promise(resolve=>{
+          el.textContent="";
+          const cursor=document.createElement('span');
+          cursor.className='gg-cursor';
+          cursor.textContent='▍';
+          el.appendChild(cursor);
+
+          let i=0;
+          const tick=()=>{
+            if(!el.isConnected) return resolve();
+            if(audioOn && (i%6===0)) playChime();
+            if(i<text.length){
+              cursor.insertAdjacentText('beforebegin', text[i]);
+              i++;
+              ggTimers.push(setTimeout(tick, speed));
+            } else {
+              cursor.remove();
+              resolve();
+            }
+          };
+          tick();
+        });
+      }
+
+      (async ()=>{
+        await typeLine(l1,L1,26);
+        ggTimers.push(setTimeout(async()=>{ await typeLine(l2,L2,24); },250));
+        ggTimers.push(setTimeout(async()=>{ await typeLine(l3,L3,22); },900));
+        ggTimers.push(setTimeout(close,4500));
+      })();
+    }
+
+    /* ===== Wrapper único: NO redeclaraciones ===== */
     const __origShowSecret = showSecret;
     showSecret = function(hash){
+      // 0401: primero blast, luego carta
+      if(hash === HASH_0401){
+        stopPetals();
+        stopGossipFx();
+        startGossipFx(()=>__origShowSecret(hash));
+        return;
+      }
+
+      // resto: carta normal
       __origShowSecret(hash);
-      if(hash === HASH_2109){ startPetals(); }
+
+      // 2109: pétalos
+      if(hash === HASH_2109) startPetals();
     };
-
-    // Al cerrar la carta, limpiar pétalos
-    document.getElementById('close-letter').addEventListener('click', stopPetals);
-
-    /* =================== FIN DE AÑADIDOS =================== */
   </script>
 </body>
 </html>
