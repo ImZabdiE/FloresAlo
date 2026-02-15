@@ -163,7 +163,7 @@
       pointer-events:none; z-index:1200;
     }
 
-    /* Mensaje post-fuegos (“¡Dijo que sí!”) */
+    /* Mensaje post-fuegos */
     #yes-toast{
       position:fixed; inset:0; display:grid; place-items:center;
       z-index:1300; pointer-events:none;
@@ -186,7 +186,7 @@
     }
     @keyframes toastIn{to{opacity:1; transform:translateY(0) scale(1)}}
 
-    /* Pétalos amarillos (renombrados para no colisionar con .petal) */
+    /* Pétalos amarillos (2109) */
     .falling-petal{
       position:fixed; top:-5vh;
       width:18px; height:12px;
@@ -200,100 +200,175 @@
       to{ transform:translateY(110vh) rotate(360deg); opacity:0; }
     }
 
-    /* ===== FX Gossip Girl (0401) ===== */
-    #gg-blast{
+    /* ===================== Juego: Camino al corazón (1426) ===================== */
+    .game{
       position:fixed; inset:0;
-      display:grid; place-items:start center;
-      padding-top:calc(env(safe-area-inset-top) + 10vh);
-      background:rgba(0,0,0,.22);
-      z-index:1400;
+      display:grid; place-items:center;
+      background:rgba(0,0,0,.25);
+      z-index:1500;
     }
-    #gg-blast[hidden]{display:none}
+    .game[hidden]{display:none}
 
-    .gg-card{
-      width:min(92vw,520px);
-      background:rgba(255,255,255,.94);
-      color:#111;
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:16px;
-      box-shadow:0 16px 42px rgba(0,0,0,.28);
+    .game__panel{
+      position:relative;
+      width:min(94vw,860px);
+      height:min(86vh,820px);
+      border-radius:18px;
       overflow:hidden;
-      transform:translateY(10px) scale(.98);
-      opacity:0;
-      animation:ggPop .28s ease forwards;
+      background:rgba(255,255,255,.95);
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow:0 18px 55px rgba(0,0,0,.30);
+      display:flex;
+      flex-direction:column;
     }
-    .theme-night .gg-card{
-      background:rgba(20,26,40,.92);
-      color:#f4f6ff;
+    .theme-night .game__panel{
+      background:rgba(15,22,35,.94);
       border-color:rgba(255,255,255,.12);
-      box-shadow:0 18px 50px rgba(0,0,0,.55);
+      box-shadow:0 20px 65px rgba(0,0,0,.55);
+      color:#eaeaea;
     }
-    @keyframes ggPop{to{transform:translateY(0) scale(1); opacity:1}}
 
-    .gg-top{
-      display:flex; justify-content:space-between; align-items:center;
-      padding:.85rem 1rem;
-      background:rgba(0,0,0,.04);
-      border-bottom:1px solid rgba(0,0,0,.08);
-      font-weight:800;
-      letter-spacing:.4px;
-    }
-    .theme-night .gg-top{
-      background:rgba(255,255,255,.05);
-      border-bottom-color:rgba(255,255,255,.10);
-    }
-    .gg-tag{
-      font-size:.78rem;
-      opacity:.9;
-      text-transform:uppercase;
-    }
-    .gg-close{
+    .game__close{
+      position:absolute; top:.7rem; right:.7rem;
       border:0; background:transparent; color:inherit;
-      font-size:1.15rem; font-weight:900; cursor:pointer;
-      line-height:1;
+      font-weight:900; font-size:1.2rem; cursor:pointer;
+      z-index:3;
+      touch-action:manipulation;
     }
 
-    .gg-body{padding:1rem 1rem 1.1rem}
-    .gg-line{
-      font-size:1.02rem;
-      line-height:1.55;
-      font-weight:700;
-      margin:.25rem 0;
-      overflow-wrap:anywhere;
+    .game__header{
+      padding:1rem 1.1rem .8rem;
+      border-bottom:1px solid rgba(0,0,0,.08);
+      background:linear-gradient(180deg, rgba(255,105,180,.12), transparent);
     }
-    .gg-cursor{
-      display:inline-block;
-      width:.55ch;
-      margin-left:.1ch;
-      animation:ggBlink .8s steps(1) infinite;
-      opacity:.8;
+    .theme-night .game__header{
+      border-bottom-color:rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(255,105,180,.10), transparent);
     }
-    @keyframes ggBlink{50%{opacity:0}}
-    .gg-foot{
-      padding:.75rem 1rem 1rem;
-      border-top:1px solid rgba(0,0,0,.08);
+    .game__title{
+      font-size:1.15rem;
       font-weight:900;
-      letter-spacing:.25px;
-      opacity:.95;
-      text-align:right;
+      letter-spacing:.2px;
+      text-align:center;
+      margin-bottom:.65rem;
     }
-    .theme-night .gg-foot{border-top-color:rgba(255,255,255,.10)}
 
-    .gg-shine{position:relative;}
-    .gg-shine::after{
+    .game__meta{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:.8rem;
+    }
+
+    .meter__label{
+      font-size:.78rem;
+      font-weight:800;
+      opacity:.85;
+      margin-bottom:.25rem;
+    }
+    .meter__bar{
+      height:10px;
+      border-radius:999px;
+      background:rgba(0,0,0,.10);
+      overflow:hidden;
+    }
+    .theme-night .meter__bar{ background:rgba(255,255,255,.10); }
+    .meter__fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, rgba(255,0,120,.75), rgba(255,105,180,.85));
+      border-radius:999px;
+      transition:width .15s linear;
+    }
+
+    .game__stage{
+      position:relative;
+      flex:1;
+      overflow:hidden;
+      touch-action:none;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,105,180,.16), transparent 45%),
+        radial-gradient(circle at 80% 35%, rgba(255,0,120,.14), transparent 48%),
+        radial-gradient(circle at 50% 85%, rgba(255,180,200,.16), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.18));
+    }
+    .theme-night .game__stage{
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,105,180,.12), transparent 45%),
+        radial-gradient(circle at 80% 35%, rgba(255,0,120,.10), transparent 48%),
+        radial-gradient(circle at 50% 85%, rgba(255,180,200,.10), transparent 50%),
+        linear-gradient(180deg, rgba(10,14,24,.55), rgba(10,14,24,.25));
+    }
+    /* Base inferior visual */
+    .game__stage::after{
       content:"";
-      position:absolute; inset:-40% -60%;
-      background:linear-gradient(120deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%);
-      transform:translateX(-30%) rotate(10deg);
-      animation:ggShine 1.1s ease forwards;
+      position:absolute;
+      left:0; right:0;
+      bottom:0;
+      height:4px;
+      background:linear-gradient(90deg, rgba(255,0,120,.6), rgba(255,105,180,.8));
+      opacity:.9;
       pointer-events:none;
     }
-    .theme-night .gg-shine::after{
-      background:linear-gradient(120deg, transparent 35%, rgba(255,255,255,.18) 50%, transparent 65%);
+
+    .player, .target, .obstacle{
+      position:absolute;
+      transform:translate(-50%,-50%);
+      will-change:transform;
+      user-select:none;
     }
-    @keyframes ggShine{to{transform:translateX(35%) rotate(10deg)}}
+
+    .player{
+      font-size:40px;
+      filter:drop-shadow(0 10px 18px rgba(0,0,0,.18));
+      touch-action:none;
+    }
+
+    .target{
+      font-size:44px;
+      opacity:.95;
+      filter:drop-shadow(0 12px 20px rgba(0,0,0,.18));
+    }
+
+    .obstacle{
+      font-size:30px;
+      opacity:.95;
+      filter:drop-shadow(0 10px 16px rgba(0,0,0,.18));
+      pointer-events:none;
+    }
+
+    .hud{
+      position:absolute;
+      left:0; right:0;
+      bottom:0;
+      padding:1rem 1rem 1.1rem;
+      display:flex;
+      flex-direction:column;
+      gap:.65rem;
+      align-items:center;
+      background:linear-gradient(180deg, transparent, rgba(0,0,0,.10));
+      pointer-events:auto;
+      touch-action:manipulation;
+    }
+    .theme-night .hud{ background:linear-gradient(180deg, transparent, rgba(0,0,0,.35)); }
+    .hud__text{
+      font-weight:900;
+      text-align:center;
+      letter-spacing:.15px;
+      white-space:pre-line;
+    }
+    .hud__actions{ display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; }
+
+    .game__footer{
+      padding:.75rem 1rem .95rem;
+      border-top:1px solid rgba(0,0,0,.08);
+      font-size:.9rem;
+      opacity:.9;
+      text-align:center;
+    }
+    .theme-night .game__footer{ border-top-color:rgba(255,255,255,.10); }
   </style>
 </head>
+
 <body>
   <!-- Modal de estado de ánimo -->
   <div class="modal" id="mood-modal" role="dialog" aria-modal="true" aria-labelledby="mood-title" hidden>
@@ -330,6 +405,44 @@
     </div>
   </section>
 
+  <!-- Página / overlay del juego: Camino al corazón (1426) -->
+  <section id="game" class="game" aria-hidden="true" hidden>
+    <div class="game__panel" role="document" aria-labelledby="game-title">
+      <button class="game__close" id="close-game" aria-label="Cerrar juego">✕</button>
+
+      <div class="game__header">
+        <h3 class="game__title" id="game-title">Camino al corazón</h3>
+        <div class="game__meta">
+          <div class="meter">
+            <div class="meter__label">Amor</div>
+            <div class="meter__bar"><div class="meter__fill" id="love-fill"></div></div>
+          </div>
+          <div class="meter">
+            <div class="meter__label">Vidas</div>
+            <div class="meter__bar"><div class="meter__fill" id="hp-fill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="game__stage" id="game-stage" aria-label="Área del juego">
+        <div class="player" id="player" aria-hidden="true">💗</div>
+        <div class="target" id="target" aria-hidden="true">💘</div>
+
+        <div class="hud">
+          <div class="hud__text" id="game-status">Desliza el corazón para llegar al final.</div>
+          <div class="hud__actions">
+            <button class="btn btn--ghost" id="game-start">Iniciar</button>
+            <button class="btn btn--ghost" id="game-restart" hidden>Reiniciar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="game__footer">
+        <div class="game__hint">Control: desliza el dedo dentro del área. Toca el corazón para salvarlo antes de que caiga.</div>
+      </div>
+    </div>
+  </section>
+
   <!-- Frase y ramo -->
   <div id="phrase" class="phrase-container" role="status" aria-live="polite" aria-hidden="true"></div>
   <div id="bouquet" class="bouquet" aria-hidden="true"></div>
@@ -350,11 +463,20 @@
     const TONES=[{h:50,s:60,l:76},{h:42,s:55,l:78},{h:30,s:55,l:78},{h:18,s:55,l:76},{h:10,s:55,l:74},{h:2,s:52,l:72},{h:345,s:50,l:76},{h:330,s:45,l:80},{h:45,s:30,l:88}];
     const hsl=(h,s,l)=>`hsl(${h} ${s}% ${l}%)`;
     const jitter=(v,sp)=>v+(Math.random()*2-1)*sp;
-    function makePastelGradient(t){const s1=Math.max(25,Math.min(70,jitter(t.s,4)));const s2=Math.max(25,Math.min(70,s1-6));const l1=Math.max(60,Math.min(90,jitter(t.l,3)));const l2=Math.max(65,Math.min(95,l1+6));return{a:hsl(t.h,s1,l1),b:hsl(t.h,s2,l2)}}
+    function makePastelGradient(t){
+      const s1=Math.max(25,Math.min(70,jitter(t.s,4)));
+      const s2=Math.max(25,Math.min(70,s1-6));
+      const l1=Math.max(60,Math.min(90,jitter(t.l,3)));
+      const l2=Math.max(65,Math.min(95,l1+6));
+      return{a:hsl(t.h,s1,l1),b:hsl(t.h,s2,l2)}
+    }
     const $=(s,el=document)=>el.querySelector(s);
     const $$=(s,el=document)=>[...el.querySelectorAll(s)];
     const shuffle=a=>Array.isArray(a)?a.slice().sort(()=>Math.random()-.5):[];
-    const store={get:(k,def)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch{return def}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+    const store={
+      get:(k,def)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch{return def}},
+      set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+    };
     const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
     function buildPastelPalette(n){const tones=shuffle(TONES).slice(0,n);return tones.map(makePastelGradient)}
 
@@ -554,9 +676,8 @@
       refreshAudioBtn();
     });
 
-    /* ===================== Carta secreta ===================== */
+    /* ===================== Carta secreta + códigos ===================== */
     const SECRET_BOOK={
-      // PIN: 2209
       "9e4067ac93c6febda554d724d453d78bf3e28a7742cdec57ee47c5c706fbe940":{
         title:"Carta para ti",
         bodyHtml: `
@@ -636,7 +757,7 @@
       try{
         const hex=await sha256Hex(value);
         if(SECRET_BOOK[hex]){
-          store.set('secretHash',hex); // solo recordar, no autoabrir
+          store.set('secretHash',hex);
           setAttempts({count:0,until:0});
           closeCodeModal();
           showSecret(hex);
@@ -653,20 +774,19 @@
       }
     });
 
-    /* Cerrar carta (X): además limpia efectos */
+    /* Cerrar carta */
     function closeLetter(){
       hideSecret();
       stopPetals();
-      stopGossipFx();
+      closeGame();
     }
     document.getElementById('close-letter').addEventListener('click', closeLetter);
 
-    /* Acceso rápido: Ctrl/Alt/Meta + L abre código */
     document.addEventListener('keydown',(e)=>{
       if(e.key.toLowerCase()==='l' && (e.ctrlKey||e.altKey||e.metaKey)) openCodeModal();
     });
 
-    /* ===================== Sí/No y fuegos artificiales ===================== */
+    /* ===================== Sí/No y fuegos artificiales (2209) ===================== */
     document.getElementById('letter-body').addEventListener('click',(e)=>{
       const btn=e.target.closest('[data-answer]');
       if(!btn) return;
@@ -798,15 +918,13 @@
       },ms);
     }
 
-    /* ===================== INICIO: flores de inmediato ===================== */
+    /* ===================== Inicio: flores de inmediato ===================== */
     setMood(mood || 'feliz');
     fitLayout();
 
     /* ===================================================================
-       AÑADIDOS: 2109 (pétalos) + 0401 (Gossip Blast antes de la carta)
+       2109: Carta + pétalos amarillos
        =================================================================== */
-
-    /* ===== 2109 ===== */
     const HASH_2109="62fb418140a7ee4153da89e8b0f7c453e27db7e034d15502422c21f476cf4fbd";
     SECRET_BOOK[HASH_2109]={
       title:"21 de septiembre — Flores amarillas",
@@ -834,155 +952,458 @@
       document.querySelectorAll('.falling-petal[data-kind="petal2109"]').forEach(n=>n.remove());
     }
 
-    /* ===== 0401 ===== */
-    const HASH_0401="12b408838e33f12bf8886792e6d44de0d9623e2bbf833b70f9f2e13fdf802706";
-    SECRET_BOOK[HASH_0401] = {
-  title: "04 de enero — Birthday Blast",
-  bodyHtml: `
-    <p><strong>¡Feliz cumpleaños al amor de mi vida!</strong></p>
+    /* ===================================================================
+       1426: Juego Camino al corazón (touch robusto + rebote lateral)
+       =================================================================== */
+    const HASH_1426 = "2c29bd822988ccf7b83e0baf85cefe1253e718cbe4ee54a119efd998260a85b7";
+    SECRET_BOOK[HASH_1426] = { title:"Juego", bodyHtml:"" };
 
-    <p>Hoy cumple años la persona que más he llegado a amar en tan poco tiempo. Una chica tan linda que, con solo verla, me transmite una paz que jamás imaginé sentir.</p>
+    const gameEl = document.getElementById('game');
+    const stageEl = document.getElementById('game-stage');
+    const playerEl = document.getElementById('player');
+    const targetEl = document.getElementById('target');
+    const loveFill = document.getElementById('love-fill');
+    const hpFill = document.getElementById('hp-fill');
+    const statusEl = document.getElementById('game-status');
+    const btnStart = document.getElementById('game-start');
+    const btnRestart = document.getElementById('game-restart');
 
-    <p>Un año más que celebras; un año en el que pasó de todo. Hubo momentos que quizá no salieron como esperábamos, pero también muchos otros que sí, y que nos hicieron crecer.</p>
+    let gRunning=false;
+    let gRAF=0;
+    let gLast=0;
 
-    <p>Hoy inicia un nuevo año: nuevas aventuras, nuevos aprendizajes y grandes logros que estoy seguro alcanzarás. Eres una persona increíble, aunque a veces no lo veas. Eres la mejor novia que alguien podría desear y, sobre todo, una gran mujer.</p>
+    let gTime=0;
+    const gDuration=60;
+    let gLove=0;
 
-    <p>Te amo. Te amé desde antes y te seguiré amando siempre.</p>
+    const maxLives=3;
+    let gLives=maxLives;
 
-    <p style="text-align:right; font-style:italic;">Atte. E</p>
-  `
-};
+    let px=0, py=0;
 
-    /* Gossip FX: overlay primero, luego carta */
-    let ggBlastEl=null;
-    let ggTimers=[];
-    function ggClearTimers(){
-      ggTimers.forEach(t=>{ try{clearTimeout(t)}catch{} });
-      ggTimers=[];
+    // Física objetivo
+    let tX=0, tY=0, tVY=0, tVX=0;
+    const gravity=900;
+    const bounce=0.78;
+    const sideBounce=0.85;
+    let floorY=0;
+    let touchedSinceBounce=false;
+
+    // Obstáculos
+    let gObstacles=[];
+    let gSpawnT=0;
+    let gSpawnEvery=0.85;
+    let gSpeed=170;
+    let gInvuln=0;
+
+    const OBSTACLES = ["💔","🧊","🕳️","🌪️","⚡","🪨"];
+    const clamp2 = (n,a,b)=>Math.max(a,Math.min(b,n));
+
+    // FX flotantes: limpieza robusta
+    let gFloatFx = [];
+
+    function openGame(){
+      hideSecret();
+      stopPetals();
+
+      gameEl.hidden=false;
+      gameEl.setAttribute('aria-hidden','false');
+
+      resetGame(true);
+      statusEl.textContent = "Desliza el corazón.\nEvita que 💘 toque el suelo.";
+      btnStart.hidden=false;
+      btnRestart.hidden=true;
+
+      setTimeout(()=>document.getElementById('close-game').focus(), 40);
     }
-    function stopGossipFx(){
-      ggClearTimers();
-      if(ggBlastEl && ggBlastEl.parentNode) ggBlastEl.remove();
-      ggBlastEl=null;
+
+    function closeGame(){
+      stopGameLoop();
+      clearObstacles();
+      clearFloatFx();
+      drag=false;
+      try{
+        if(activePointerId!==null) stageEl.releasePointerCapture(activePointerId);
+      }catch{}
+      activePointerId=null;
+
+      gameEl.hidden=true;
+      gameEl.setAttribute('aria-hidden','true');
     }
 
-    function startGossipFx(onDone){
-      stopGossipFx();
+    document.getElementById('close-game').addEventListener('click', closeGame);
+    gameEl.addEventListener('click', (e)=>{ if(e.target===gameEl) closeGame(); });
+    document.addEventListener('keydown', (e)=>{ if(!gameEl.hidden && e.key==='Escape') closeGame(); });
 
-      ggBlastEl=document.createElement('div');
-      ggBlastEl.id='gg-blast';
+    // Tap robusto (pointerup) + fallback click sin doble disparo
+    function bindTap(el, fn){
+      if(!el) return;
+      let lastPointerUp = 0;
 
-      const card=document.createElement('div');
-      card.className='gg-card gg-shine';
+      el.addEventListener('pointerdown', (e)=>{ e.stopPropagation(); }, {passive:true});
 
-      const top=document.createElement('div');
-      top.className='gg-top';
-      top.innerHTML=`
-        <div class="gg-tag">Gossip Girl • Blast</div>
-        <button class="gg-close" aria-label="Cerrar">✕</button>
-      `;
+      el.addEventListener('pointerup', (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        lastPointerUp = performance.now();
+        fn(e);
+      }, {passive:false});
 
-      const body=document.createElement('div');
-      body.className='gg-body';
-      body.innerHTML=`
-        <div class="gg-line" id="gg-l1"></div>
-        <div class="gg-line" id="gg-l2"></div>
-        <div class="gg-line" id="gg-l3"></div>
-      `;
+      el.addEventListener('click', (e)=>{
+        if(performance.now() - lastPointerUp < 450) { e.preventDefault(); e.stopPropagation(); return; }
+        e.preventDefault();
+        e.stopPropagation();
+        fn(e);
+      }, {passive:false});
+    }
 
-      const foot=document.createElement('div');
-      foot.className='gg-foot';
-      foot.textContent="You know you love me. XOXO.";
+    bindTap(btnStart, ()=>{
+      btnStart.hidden=true;
+      btnRestart.hidden=false;
+      startGameLoop();
+    });
 
-      card.appendChild(top);
-      card.appendChild(body);
-      card.appendChild(foot);
-      ggBlastEl.appendChild(card);
-      document.body.appendChild(ggBlastEl);
+    bindTap(btnRestart, ()=>{
+      resetGame(false);
+      startGameLoop();
+    });
 
-      let doneCalled=false;
-      const doneOnce=()=>{
-        if(doneCalled) return;
-        doneCalled=true;
-        if(typeof onDone==='function') onDone();
-      };
+    function resetGame(keepText){
+      stopGameLoop();
+      clearObstacles();
+      clearFloatFx();
 
-      const closeBtn=top.querySelector('.gg-close');
-      const onKey=(e)=>{ if(e.key==='Escape') close(); };
+      const r = stageEl.getBoundingClientRect();
+      px = r.width*0.50;
+      py = r.height*0.84;
+      setPos(playerEl, px, py);
 
-      const close=()=>{
-        if(!ggBlastEl) return;
-        ggBlastEl.style.transition='opacity .25s ease, transform .25s ease';
-        ggBlastEl.style.opacity='0';
-        ggBlastEl.style.transform='translateY(-4px)';
-        ggTimers.push(setTimeout(()=>{
-          stopGossipFx();
-          document.removeEventListener('keydown', onKey);
-          doneOnce();
-        },260));
-      };
+      floorY = r.height - 10;
+      tX = r.width*0.50;
+      tY = r.height*0.20;
+      tVY = 0;
+      tVX = (Math.random()*2-1)*180;
+      touchedSinceBounce=false;
+      setPos(targetEl, tX, tY);
 
-      closeBtn.addEventListener('click', close);
-      ggBlastEl.addEventListener('click',(e)=>{ if(e.target===ggBlastEl) close(); });
-      document.addEventListener('keydown', onKey);
+      gTime=0;
+      gLove=0;
+      gLives=maxLives;
 
-      const L1="Spotted: Hoy cumples años.";
-      const L2="En el Upper East Side, esto se celebra como se debe.";
-      const L3="Feliz cumpleaños, reina.";
+      gSpawnT=0;
+      gSpawnEvery=0.85;
+      gSpeed=170;
+      gInvuln=0;
 
-      const l1=document.getElementById('gg-l1');
-      const l2=document.getElementById('gg-l2');
-      const l3=document.getElementById('gg-l3');
+      updateMeters();
 
-      function typeLine(el,text,speed=26){
-        return new Promise(resolve=>{
-          el.textContent="";
-          const cursor=document.createElement('span');
-          cursor.className='gg-cursor';
-          cursor.textContent='▍';
-          el.appendChild(cursor);
+      if(!keepText) statusEl.textContent="Otra vez.\nEvita que 💘 toque el suelo.";
+    }
 
-          let i=0;
-          const tick=()=>{
-            if(!el.isConnected) return resolve();
-            if(audioOn && (i%6===0)) playChime();
-            if(i<text.length){
-              cursor.insertAdjacentText('beforebegin', text[i]);
-              i++;
-              ggTimers.push(setTimeout(tick, speed));
-            } else {
-              cursor.remove();
-              resolve();
-            }
-          };
-          tick();
-        });
+    function startGameLoop(){
+      if(gRunning) return;
+      gRunning=true;
+      gLast=performance.now();
+      statusEl.textContent="Mantén 💘 en el aire.\n60 segundos.";
+      gRAF=requestAnimationFrame(loopGame);
+    }
+
+    function stopGameLoop(){
+      gRunning=false;
+      try{ cancelAnimationFrame(gRAF); }catch{}
+    }
+
+    function loopGame(t){
+      if(!gRunning) return;
+      const dt = Math.min(0.05, (t - gLast)/1000);
+      gLast = t;
+
+      stepGame(dt);
+      gRAF=requestAnimationFrame(loopGame);
+    }
+
+    function stepGame(dt){
+      gTime += dt;
+      gLove = clamp2((gTime / gDuration)*100, 0, 100);
+
+      const k = clamp2(gTime / gDuration, 0, 1);
+      gSpeed = 170 + 150*k;
+      gSpawnEvery = 0.90 - 0.35*k;
+
+      gSpawnT += dt;
+      if(gSpawnT >= gSpawnEvery){
+        gSpawnT = 0;
+        spawnObstacle();
       }
 
-      (async ()=>{
-        await typeLine(l1,L1,26);
-        ggTimers.push(setTimeout(async()=>{ await typeLine(l2,L2,24); },250));
-        ggTimers.push(setTimeout(async()=>{ await typeLine(l3,L3,22); },900));
-        ggTimers.push(setTimeout(close,4500));
-      })();
+      if(gInvuln>0) gInvuln -= dt;
+
+      // FÍSICA 2D (caída + rebotes laterales)
+      tVY += gravity * dt;
+      tY  += tVY * dt;
+      tX  += tVX * dt;
+
+      const r = stageEl.getBoundingClientRect();
+
+      // Rebote paredes
+      if(tX <= 18){
+        tX = 18;
+        tVX *= -sideBounce;
+      }else if(tX >= r.width-18){
+        tX = r.width-18;
+        tVX *= -sideBounce;
+      }
+
+      // Rebote suelo
+      if(tY >= floorY){
+        tY = floorY;
+        tVY *= -bounce;
+
+        if(!touchedSinceBounce){
+          gLives = clamp2(gLives - 1, 0, maxLives);
+          stageEl.classList.add('shake');
+          setTimeout(()=>stageEl.classList.remove('shake'), 320);
+          if(navigator.vibrate) try{ navigator.vibrate(35); }catch{}
+        }
+
+        touchedSinceBounce=false;
+
+        // Empuje lateral aleatorio en cada rebote
+        tVX += (Math.random()*2-1)*220;
+
+        if(Math.abs(tVY) < 280) tVY = -520;
+      }
+
+      setPos(targetEl, tX, tY);
+
+      // Tocar para salvar: impulso vertical + cambio lateral
+      const pr = playerEl.getBoundingClientRect();
+      const tr = targetEl.getBoundingClientRect();
+      if(intersects(pr, tr)){
+        touchedSinceBounce = true;
+        tVY = -760;
+        tVX += (Math.random()*2-1)*260;
+      }
+
+      // Obstáculos + vidas
+      for(let i=gObstacles.length-1;i>=0;i--){
+        const o = gObstacles[i];
+        o.y += o.vy*dt;
+        o.x += o.vx*dt;
+
+        if(o.x < 12) o.x = 12;
+        if(o.x > r.width-12) o.x = r.width-12;
+
+        setPos(o.el, o.x, o.y);
+
+        if(o.y > r.height + 60){
+          o.el.remove();
+          gObstacles.splice(i,1);
+          continue;
+        }
+
+        const or = o.el.getBoundingClientRect();
+        if(intersects(pr, or)){
+          if(gInvuln<=0){
+            gInvuln = 0.55;
+            gLives = clamp2(gLives - 1, 0, maxLives);
+            stageEl.classList.add('shake');
+            setTimeout(()=>stageEl.classList.remove('shake'), 320);
+            if(navigator.vibrate) try{ navigator.vibrate(35); }catch{}
+          }
+          o.y += 40;
+        }
+      }
+
+      updateMeters();
+
+      if(gLives<=0){ endGame(false); return; }
+      if(gLove>=100){ endGame(true); return; }
     }
 
-    /* ===== Wrapper único: NO redeclaraciones ===== */
+    function endGame(win){
+      stopGameLoop();
+      clearObstacles();
+
+      if(win){
+        btnStart.hidden=true;
+        btnRestart.hidden=true;
+        statusEl.textContent =
+          "Al final del camino no había una meta ni una victoria.\n" +
+          "Había un hogar.\n" +
+          "Y entendí que, pase lo que pase, mi lugar siempre será contigo.\n" +
+          "Te amo mi niña, siempre te amaré.\n";
+        for(let i=0;i<14;i++) spawnFloatHeart();
+      }else{
+        btnStart.hidden=true;
+        btnRestart.hidden=false;
+        statusEl.textContent = "Se acabaron tus vidas.\nReinicia e inténtalo de nuevo.";
+      }
+    }
+
+    function spawnObstacle(){
+      const r = stageEl.getBoundingClientRect();
+      const el = document.createElement('div');
+      el.className='obstacle';
+      el.textContent = OBSTACLES[Math.floor(Math.random()*OBSTACLES.length)];
+      stageEl.appendChild(el);
+
+      const x = 18 + Math.random()*(r.width-36);
+      const y = -20;
+      const vy = gSpeed * (0.85 + Math.random()*0.35);
+      const vx = (Math.random()*2-1) * (40 + Math.random()*55);
+
+      gObstacles.push({el,x,y,vy,vx});
+      setPos(el,x,y);
+    }
+
+    function clearObstacles(){
+      gObstacles.forEach(o=>{ try{o.el.remove()}catch{} });
+      gObstacles.length=0;
+    }
+
+    function clearFloatFx(){
+      for(let i=0;i<gFloatFx.length;i++){
+        const fx=gFloatFx[i];
+        try{ cancelAnimationFrame(fx.raf); }catch{}
+        try{ fx.el.remove(); }catch{}
+      }
+      gFloatFx.length=0;
+    }
+
+    function setPos(el,x,y){
+      el.style.left = x + 'px';
+      el.style.top  = y + 'px';
+    }
+
+    function intersects(a,b){
+      return !(a.right<b.left || a.left>b.right || a.bottom<b.top || a.top>b.bottom);
+    }
+
+    // Input táctil: drag SOLO en área libre
+    let drag=false;
+    let activePointerId=null;
+
+    function isUiOrigin(ev){
+      const t = ev.target;
+      if(!t) return false;
+      return !!(t.closest('.hud') || t.closest('button') || t.closest('#close-game'));
+    }
+
+    const hudEl = stageEl.querySelector('.hud');
+    if(hudEl){
+      hudEl.addEventListener('pointerdown', (e)=>{ e.stopPropagation(); }, {passive:true});
+      hudEl.addEventListener('pointermove', (e)=>{ e.stopPropagation(); }, {passive:true});
+      hudEl.addEventListener('pointerup',   (e)=>{ e.stopPropagation(); }, {passive:true});
+    }
+
+    stageEl.addEventListener('pointerdown', (e)=>{
+      if(gameEl.hidden) return;
+      if(isUiOrigin(e)) return;
+
+      e.preventDefault();
+      drag=true;
+      activePointerId=e.pointerId;
+
+      try{ stageEl.setPointerCapture(e.pointerId); }catch{}
+      movePlayerToEvent(e);
+    }, {passive:false});
+
+    stageEl.addEventListener('pointermove', (e)=>{
+      if(!drag) return;
+      if(activePointerId!==null && e.pointerId!==activePointerId) return;
+      e.preventDefault();
+      movePlayerToEvent(e);
+    }, {passive:false});
+
+    stageEl.addEventListener('pointerup', (e)=>{
+      if(activePointerId!==null && e.pointerId!==activePointerId) return;
+      drag=false;
+      try{ stageEl.releasePointerCapture(e.pointerId); }catch{}
+      activePointerId=null;
+    }, {passive:true});
+
+    stageEl.addEventListener('pointercancel', (e)=>{
+      if(activePointerId!==null && e.pointerId!==activePointerId) return;
+      drag=false;
+      try{ stageEl.releasePointerCapture(e.pointerId); }catch{}
+      activePointerId=null;
+    }, {passive:true});
+
+    function movePlayerToEvent(e){
+      const r = stageEl.getBoundingClientRect();
+      const x = clamp2(e.clientX - r.left, 18, r.width-18);
+      const y = clamp2(e.clientY - r.top,  40, r.height-18);
+      px=x; py=y;
+      setPos(playerEl, px, py);
+    }
+
+    function updateMeters(){
+      loveFill.style.width = gLove.toFixed(1) + '%';
+      hpFill.style.width = ((gLives / maxLives) * 100).toFixed(1) + '%';
+      if(gLives<=1){
+        hpFill.style.background = 'linear-gradient(90deg, rgba(255,70,70,.85), rgba(255,140,140,.85))';
+      }else{
+        hpFill.style.background = 'linear-gradient(90deg, rgba(255,0,120,.75), rgba(255,105,180,.85))';
+      }
+    }
+
+    function spawnFloatHeart(){
+      const r = stageEl.getBoundingClientRect();
+      const h = document.createElement('div');
+      h.className='obstacle';
+      h.textContent='💖';
+      h.style.opacity='0.95';
+      stageEl.appendChild(h);
+
+      const obj = {
+        el:h,
+        x: 18 + Math.random()*(r.width-36),
+        y: r.height + 25,
+        vy: -(110 + Math.random()*130),
+        vx: (Math.random()*2-1) * (20 + Math.random()*40),
+        life: 1.1 + Math.random()*0.8,
+        last: 0,
+        raf: 0
+      };
+      setPos(h,obj.x,obj.y);
+
+      const tick = (t)=>{
+        if(!obj.last) obj.last=t;
+        const dt=Math.min(0.05,(t-obj.last)/1000);
+        obj.last=t;
+
+        obj.life -= dt;
+        if(obj.life<=0){
+          try{ h.remove(); }catch{}
+          const idx=gFloatFx.indexOf(obj);
+          if(idx>=0) gFloatFx.splice(idx,1);
+          return;
+        }
+
+        obj.y += obj.vy*dt;
+        obj.x += obj.vx*dt;
+        setPos(h,obj.x,obj.y);
+        h.style.opacity = String(clamp2(obj.life,0,1));
+
+        obj.raf=requestAnimationFrame(tick);
+      };
+
+      obj.raf=requestAnimationFrame(tick);
+      gFloatFx.push(obj);
+    }
+
+    /* ===================== Wrapper único: 1426/2109/normal ===================== */
     const __origShowSecret = showSecret;
     showSecret = function(hash){
-      // 0401: primero blast, luego carta
-      if(hash === HASH_0401){
-        stopPetals();
-        stopGossipFx();
-        startGossipFx(()=>__origShowSecret(hash));
+      if(hash === HASH_1426){
+        openGame();
         return;
       }
-
-      // resto: carta normal
       __origShowSecret(hash);
-
-      // 2109: pétalos
-      if(hash === HASH_2109) startPetals();
+      if(hash === HASH_2109){
+        startPetals();
+      }
     };
   </script>
 </body>
