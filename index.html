@@ -448,6 +448,104 @@
       text-align:center;
     }
     .theme-night .game__footer{ border-top-color:rgba(255,255,255,.10); }
+  
+    /* Girasoles permanentes en el ramo principal tras el código 2109. */
+    .bouquet.is-yellow{position:fixed;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom));height:min(60svh,610px);display:flex;justify-content:center;align-items:flex-end;transform:none;-webkit-transform:none;pointer-events:none}
+    .is-yellow .yg-art{display:block;width:min(94vw,540px);height:100%;overflow:visible}
+    /* Tallos y cabezas comparten pivote y fase para mantenerse unidos. */
+    .yg-plant{transform-box:view-box;transform-origin:var(--root-x) 608px;animation:ygBreeze var(--wind-time) ease-in-out infinite alternate;animation-delay:var(--wind-delay)}
+    .yg-leaf{transform-box:view-box;transform-origin:0 0;animation:ygLeaf 3.8s ease-in-out infinite alternate;animation-delay:var(--wind-delay)}
+    .yg-petal-ring{transform-box:view-box;transform-origin:0 0;animation:ygPetals 4.6s ease-in-out infinite alternate;animation-delay:var(--wind-delay)}
+    .yg-petal-ring--inner{animation-direction:alternate-reverse;animation-duration:5.3s}
+    .is-yellow.is-paused .yg-plant,.is-yellow.is-paused .yg-leaf,.is-yellow.is-paused .yg-petal-ring{animation-play-state:paused}
+    @keyframes ygBreeze{from{transform:rotate(calc(-1 * var(--wind-angle)))}to{transform:rotate(var(--wind-angle))}}
+    @keyframes ygLeaf{from{transform:rotate(-3deg) scaleY(.98)}to{transform:rotate(3deg) scaleY(1.02)}}
+    @keyframes ygPetals{from{transform:rotate(-.8deg) scale(.99)}to{transform:rotate(.8deg) scale(1.015)}}
+    .yg-grow{animation:ygReveal 1.5s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--delay)}
+    @keyframes ygReveal{from{opacity:0;transform:translateY(35px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-height:480px){.bouquet.is-yellow{height:54svh;bottom:60px}}
+    @media(prefers-reduced-motion:reduce){.yg-grow,.yg-plant,.yg-leaf,.yg-petal-ring{animation:none}}
+
+    /* Identidad botánica: papel crema, tinta oliva y detalles dorados. */
+    :root{--paper:#f6f3e9;--ink:#344234;--muted:#747965;--line:#dddccf;--surface:#fffcf5;--accent:#9c762e;--boton-fondo:#455b40;--boton-hover:#344931;--texto-principal:var(--ink);--radius:24px}
+    body{display:block;background:var(--paper);color:var(--ink);overflow:auto;animation:none;-webkit-animation:none;transition:background .4s,color .4s}
+    body.theme-night{--paper:#19221c;--ink:#e8e8d7;--muted:#adb49e;--line:#384539;--surface:#222f25;--accent:#d5b66e;--boton-fondo:#66805a;--boton-hover:#7a936c;background:var(--paper)}
+    .page-shell{max-width:1360px;min-height:100svh;margin:auto;padding:28px clamp(22px,5vw,76px) 22px;display:flex;flex-direction:column}
+    .page-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:11px;color:var(--ink);font:italic 25px Georgia,serif;letter-spacing:-.5px}
+    .brand svg{width:28px;height:28px;color:var(--accent)}
+    .header-right{display:flex;align-items:center;gap:25px}
+    .header-note{font-size:10px;letter-spacing:2.2px;text-transform:uppercase;color:var(--muted)}
+    .page-header .icon-btn{position:static;flex-shrink:0;width:40px;height:40px;background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--ink);backdrop-filter:none}
+    .icon-btn svg,.toolbar svg{width:18px;height:18px;flex-shrink:0}
+    .hero{display:grid;grid-template-columns:1fr 1.15fr;align-items:center;gap:30px;flex:1;padding:32px 0}
+    .hero-copy{position:relative;z-index:5;padding:12px 0 18px}
+    .eyebrow{display:flex;align-items:center;gap:12px;font-size:10px;letter-spacing:2.3px;text-transform:uppercase;color:var(--accent);margin-bottom:23px}
+    .eyebrow::before{content:'';width:30px;height:1px;background:currentColor}
+    .hero-title{font:normal clamp(44px,4.6vw,66px)/1.08 Georgia,'Times New Roman',serif;letter-spacing:-2.4px;max-width:540px}
+    .hero-title em{font-weight:normal;color:var(--accent)}
+    .phrase-container{position:relative;top:auto!important;left:auto;transform:none;width:100%;max-width:445px;min-height:150px;margin:28px 0 0;padding:0;text-align:left;font:400 clamp(16px,1.5vw,19px)/1.75 system-ui,sans-serif;color:var(--muted);text-shadow:none;overflow-wrap:normal;text-wrap:pretty}
+    .copy-sign{display:flex;gap:10px;align-items:center;font:italic 16px Georgia,serif;color:var(--accent);margin-top:12px}
+    .copy-sign::before{content:'';width:22px;height:1px;background:var(--line)}
+    .floral-stage{position:relative;isolation:isolate;height:clamp(440px,64svh,650px);min-width:0;display:flex;align-items:flex-end;justify-content:center}
+    .floral-stage::before{content:'';position:absolute;inset:2% 7% 9%;z-index:-1;border:1px solid #d9d4ba;border-radius:48% 48% 44% 44%;background:radial-gradient(ellipse at 50% 42%,#fffbe9 5%,#ece8d3 85%);transform:rotate(-5deg)}
+    .floral-stage::after{content:'';position:absolute;inset:5% 4% 7%;z-index:-1;border:1px solid #d6ceb455;border-radius:48%;transform:rotate(6deg);pointer-events:none}
+    .theme-night .floral-stage::before{border-color:#596347;background:radial-gradient(ellipse at 50% 42%,#3b4830,#263227 85%)}
+    .theme-night .floral-stage::after{border-color:#a39c6030}
+    .floral-stage .bouquet{position:absolute;inset:auto 0 36px;width:100%;height:85%;transform:scale(var(--bouquet-scale,1));transform-origin:center bottom}
+    .floral-stage .bouquet.is-yellow{position:absolute;inset:0 0 25px;height:auto;width:100%;transform:none;display:flex;align-items:center;justify-content:center}
+    .is-yellow .yg-art{width:100%;height:100%;max-height:660px;overflow:visible}
+    .garden-caption{position:absolute;bottom:0;text-align:center;color:var(--muted);font-size:10px;letter-spacing:2.3px;text-transform:uppercase}
+    .page-footer{border-top:1px solid var(--line);padding-top:18px;display:flex;justify-content:space-between;align-items:center;gap:18px}
+    .footer-note{color:var(--muted);font-size:11px;line-height:1.6;max-width:180px}
+    .toolbar{position:static;transform:none;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px;background:none!important;border:0;box-shadow:none!important;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
+    .toolbar .btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 14px;font-size:12px;font-weight:500;border-radius:999px;background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none;white-space:nowrap}
+    .toolbar .btn:hover{background:var(--surface);border-color:var(--muted);transform:translateY(-1px)}
+    .toolbar #open-code{background:var(--boton-fondo);border-color:var(--boton-fondo);color:#fff}
+    .toolbar #open-code:hover{background:var(--boton-hover)}
+    .btn{border-radius:14px;font-size:14px;min-height:46px}
+    .btn:focus-visible,button:focus-visible,.code-input:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+    .modal,.secret,.game{background:#1a251c66;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding:16px}
+    .modal__panel,.theme-night .modal__panel,.letter,.theme-night .letter{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:24px;box-shadow:0 25px 90px #17241d24}
+    .modal__panel{padding:40px 28px 30px;width:min(92vw,430px);max-height:90svh;overflow:auto}
+    .modal__title{font:normal 30px/1.2 Georgia,serif;letter-spacing:-.7px;margin:0 12px 15px}
+    .modal-kicker{text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:15px}
+    .modal-description{font-size:13px;line-height:1.7;text-align:center;color:var(--muted);margin:0 0 24px}
+    .modal__close,.letter__close,.game__close{width:36px;height:36px;border-radius:50%;top:10px;right:10px;color:var(--muted)}
+    .modal__close:hover,.letter__close:hover{color:var(--ink);background:var(--paper)}
+    .modal__actions .btn{flex:1;background:var(--paper);color:var(--ink);border:1px solid var(--line);font-weight:500}
+    .code-input,.theme-night .code-input{background:var(--paper);color:var(--ink);border:1px solid var(--line);text-align:center;letter-spacing:10px;font-size:24px;height:64px;border-radius:14px}
+    .code-input::placeholder{letter-spacing:1px;font-size:14px;color:var(--muted)}
+    .code-hint{font-size:12px;color:var(--muted)}
+    .letter{padding:46px clamp(24px,5vw,56px);width:min(92vw,660px);max-height:84svh}
+    .letter::before{content:'PALABRAS PARA TI';display:block;text-align:center;font:10px system-ui;letter-spacing:3px;color:var(--accent);margin-bottom:20px}
+    .letter__title{font:normal clamp(26px,4vw,34px)/1.2 Georgia,serif;margin:0 0 24px;color:var(--ink)}
+    .letter__body{font:normal 17px/1.85 Georgia,serif;color:var(--ink)}
+    .letter__body p+p{margin-top:1.1em}
+    .game__panel,.theme-night .game__panel{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:24px}
+    .game__header,.theme-night .game__header{background:linear-gradient(180deg,#c5ad6320,transparent);border-color:var(--line)}
+    .game__title{font:normal 26px Georgia,serif;margin-bottom:16px}
+    .game__stage,.theme-night .game__stage{background:radial-gradient(ellipse at 50% 20%,#b6be7020,transparent),var(--paper)}
+    .game__footer{border-color:var(--line)}
+    .gg-card,.theme-night .gg-card{background:var(--surface);color:var(--ink);border-color:var(--line)}
+    @media(min-width:1500px){.page-shell{max-width:1440px}.hero{gap:70px}}
+    @media(max-width:760px){
+      .page-shell{padding:18px 22px 24px}.page-header{padding-bottom:16px}.header-note{display:none}.brand{font-size:23px}
+      .hero{grid-template-columns:1fr;gap:0;padding:28px 0 18px}.hero-copy{text-align:center;padding:0}.eyebrow{justify-content:center;margin-bottom:16px;font-size:9px}
+      .hero-title{font-size:clamp(35px,8vw,48px);letter-spacing:-1.3px;margin:auto}.phrase-container{font-size:15px;line-height:1.7;margin:18px auto 0;min-height:110px;max-width:420px;text-align:center}
+      .copy-sign{justify-content:center;margin:0}.floral-stage{height:clamp(335px,49svh,480px);width:100%;max-width:490px;margin:18px auto 0}
+      .floral-stage .bouquet:not(.is-yellow){transform:scale(.82)}.page-footer{flex-direction:column-reverse;gap:16px;padding-top:18px}.toolbar{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.toolbar .btn{font-size:10px;padding:10px 5px;gap:7px;flex-direction:column;border-radius:16px;min-height:62px}.toolbar svg{width:15px;height:15px}.footer-note{max-width:none;text-align:center;font-size:10px}
+    }
+    @media(max-width:370px){.page-shell{padding-left:15px;padding-right:15px}.toolbar .btn{padding:10px 3px}.toolbar svg{display:block}}
+    @media(prefers-reduced-motion:reduce){body,.btn,.bouquet,.phrase-container{transition:none}.letter{animation:none;opacity:1;transform:none}}
+
+    /* Archivo de cartas: cada septiembre conserva sus palabras. */
+    .letter-tabs{display:flex;gap:6px;padding:5px;margin:0 0 28px;background:var(--paper);border:1px solid var(--line);border-radius:14px}
+    .letter-tabs[hidden]{display:none}
+    .letter-tab{flex:1;min-height:44px;padding:10px 12px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--muted);font:500 13px system-ui;cursor:pointer;transition:background .2s,color .2s}
+    .letter-tab[aria-selected="true"]{background:var(--boton-fondo);border-color:var(--boton-fondo);color:#fff}
+    .letter-tab:hover:not([aria-selected="true"]){background:var(--surface);color:var(--ink)}
+    #letter-body[role="tabpanel"]:focus-visible{outline:2px solid var(--accent);outline-offset:8px;border-radius:4px}
   </style>
 </head>
 
@@ -456,10 +554,12 @@
   <div class="modal" id="mood-modal" role="dialog" aria-modal="true" aria-labelledby="mood-title" hidden>
     <div class="modal__panel">
       <button class="modal__close" id="close-modal" aria-label="Cerrar">✕</button>
+      <p class="modal-kicker">Este espacio es tuyo</p>
       <h2 id="mood-title" class="modal__title">¿Cómo te sientes hoy?</h2>
+      <p class="modal-description">Como sea que te sientas, aquí hay unas palabras para acompañarte.</p>
       <div class="modal__actions">
-        <button class="btn" data-mood="feliz" id="btn-feliz">😊 Feliz</button>
-        <button class="btn" data-mood="triste">💙 Triste</button>
+        <button class="btn" data-mood="feliz" id="btn-feliz">Me siento feliz</button>
+        <button class="btn" data-mood="triste">Un poco triste</button>
       </div>
     </div>
   </div>
@@ -468,7 +568,9 @@
   <div class="modal" id="code-modal" role="dialog" aria-modal="true" aria-labelledby="code-title" hidden>
     <div class="modal__panel">
       <button class="modal__close" id="close-code" aria-label="Cerrar">✕</button>
+      <p class="modal-kicker">Solo tú sabes</p>
       <h2 id="code-title" class="modal__title">Ingresa tu código</h2>
+      <p class="modal-description">Cuatro números pueden guardar algo muy bonito.</p>
       <form id="code-form" class="code-form" autocomplete="off">
         <label class="visually-hidden" for="code-input">Código</label>
         <input id="code-input" class="code-input" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="Ingresa 4 dígitos" required pattern="\d{4}" maxlength="4" />
@@ -483,6 +585,7 @@
     <div class="letter" role="document" aria-labelledby="letter-title">
       <button class="letter__close" id="close-letter" aria-label="Ocultar carta">✕</button>
       <h3 class="letter__title" id="letter-title"></h3>
+      <div class="letter-tabs" id="letter-tabs" role="tablist" aria-label="Cartas del 21 de septiembre" hidden></div>
       <div class="letter__body" id="letter-body"></div>
     </div>
   </section>
@@ -525,20 +628,30 @@
     </div>
   </section>
 
-  <!-- Frase y ramo -->
-  <div id="phrase" class="phrase-container" role="status" aria-live="polite" aria-hidden="true"></div>
-  <div id="bouquet" class="bouquet" aria-hidden="true"></div>
-
-  <!-- Barra de herramientas -->
-  <div class="toolbar" aria-label="Herramientas">
-    <button class="btn btn--ghost" id="change-mood" title="Cambiar estado">Estado</button>
-    <button class="btn btn--ghost" id="pause-anim" title="Pausar animación">Pausar</button>
-    <button class="btn btn--ghost" id="toggle-theme" title="Cambiar tema">Modo noche</button>
-    <button class="btn btn--ghost" id="open-code" title="Ingresar código">Código</button>
-  </div>
-
-  <!-- Icono de sonido -->
-  <button class="icon-btn sound-btn" id="toggle-audio" title="Activar/Desactivar sonido" aria-label="Activar/Desactivar sonido">🔈</button>
+  <main class="page-shell">
+    <header class="page-header">
+      <div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8c-6-10-11-1-5 3-11 0-7 10 1 6-4 10 7 10 7 1 8 6 12-4 3-6 8-6 0-12-5-5Z"/><circle cx="12" cy="13" r="3"/></svg><span>Para ti.</span></div>
+      <div class="header-right"><span class="header-note">Un pequeño jardín de cariño</span><button class="icon-btn sound-btn" id="toggle-audio" title="Desactivar sonido" aria-label="Desactivar sonido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4ZM15 8q5 4 0 8M18 5q8 7 0 14"/></svg></button></div>
+    </header>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Un detalle que florece</p>
+        <h1 class="hero-title" id="page-title">Hay cosas bonitas.<br>Y luego <em>estás tú.</em></h1>
+        <div id="phrase" class="phrase-container" role="status" aria-live="polite" aria-hidden="true"></div>
+        <p class="copy-sign">Con todo mi cariño, E.</p>
+      </div>
+      <div class="floral-stage"><div id="bouquet" class="bouquet" aria-hidden="true"></div><p class="garden-caption">Hay flores que nunca se marchitan</p></div>
+    </section>
+    <footer class="page-footer">
+      <p class="footer-note">Un rincón para hacerte sonreír.<br>Hoy y todos los días.</p>
+      <nav class="toolbar" aria-label="Herramientas del jardín">
+        <button class="btn btn--ghost" id="change-mood" title="Cambiar estado de ánimo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 14q4 5 8 0M8 9h.01M16 9h.01"/></svg><span>Mi ánimo</span></button>
+        <button class="btn btn--ghost" id="pause-anim" title="Pausar animación" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg><span>Pausar</span></button>
+        <button class="btn btn--ghost" id="toggle-theme" title="Cambiar tema" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14A9 9 0 0 1 10 4a9 9 0 1 0 10 10Z"/></svg><span>Modo noche</span></button>
+        <button class="btn btn--ghost" id="open-code" title="Ingresar código"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="9" r="4"/><path d="m11 12 9 9m-4-4 3-3m-6 0 3-3"/></svg><span>Código</span></button>
+      </nav>
+    </footer>
+  </main>
 
   <script>
     /* ===================== Paletas y utilidades ===================== */
@@ -658,6 +771,12 @@
 
     function renderBouquet(){
       bouquet.replaceChildren();
+      bouquet.classList.toggle('is-yellow', yellowBouquetActive);
+      if(yellowBouquetActive){
+        bouquet.innerHTML=yellowBouquetSVG();
+        bouquet.classList.toggle('is-paused',paused);
+        return;
+      }
       const stems=generateStems(STEM_COUNT);
       const colors=buildPastelPalette(stems.length);
       stems.forEach(({h,x,dur},i)=>{
@@ -692,7 +811,7 @@
     function cyclePhrase(){
       if(!phrases.length) return;
       phraseEl.setAttribute('aria-hidden','false');
-      phraseEl.textContent=phrases[phraseIdx];
+      phraseEl.textContent=phrases[phraseIdx].replace(/^[^\p{L}\p{N}]+/u,'').replace(/["“”]/g,'').replace(/\s*<3$/,'');
       playChime();
       clearTimeout(timer);
       timer=setTimeout(()=>{
@@ -729,16 +848,19 @@
     document.getElementById('pause-anim').addEventListener('click',()=>{
       paused=!paused;
       const state=paused?'paused':'running';
+      bouquet.classList.toggle('is-paused',paused);
       $$('.stem',bouquet).forEach(s=>{
         s.style.animationPlayState=state;
         s.style.webkitAnimationPlayState=state;
       });
-      document.getElementById('pause-anim').textContent=paused?'Reanudar':'Pausar';
+      document.querySelector('#pause-anim span').textContent=paused?'Reanudar':'Pausar';
+      document.getElementById('pause-anim').setAttribute('aria-pressed',String(paused));
     });
 
     function applyTheme(night){
       document.body.classList.toggle('theme-night',night);
-      document.getElementById('toggle-theme').textContent=night?'Modo día':'Modo noche';
+      document.querySelector('#toggle-theme span').textContent=night?'Modo día':'Modo noche';
+      document.getElementById('toggle-theme').setAttribute('aria-pressed',String(night));
       store.set('themeNight',night);
     }
     function applyThemeOnLoad(){ applyTheme(store.get('themeNight',false)); }
@@ -748,7 +870,8 @@
     function refreshAudioBtn(){
       const b=document.getElementById('toggle-audio'); if(!b) return;
       const on=audioOn;
-      b.textContent=on?'🔈':'🔇';
+      b.innerHTML=on?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4ZM15 8q5 4 0 8M18 5q8 7 0 14"/></svg>`:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4ZM16 9l5 6m0-6-5 6"/></svg>`;
+      b.setAttribute('aria-pressed',String(on));
       b.setAttribute('aria-label',on?'Desactivar sonido':'Activar sonido');
       b.title=on?'Desactivar sonido':'Activar sonido';
     }
@@ -787,10 +910,54 @@
 
     function showSecret(hash){
       const rec=SECRET_BOOK[hash]; if(!rec) return;
+      const body=document.getElementById('letter-body');
+      const tabs=document.getElementById('letter-tabs');
       document.getElementById('letter-title').textContent=rec.title||'Carta';
-      document.getElementById('letter-body').innerHTML=rec.bodyHtml||'';
+      tabs.replaceChildren();
+      tabs.hidden=!rec.editions;
+      body.removeAttribute('role');
+      body.removeAttribute('aria-labelledby');
+      body.removeAttribute('tabindex');
+      if(rec.editions){
+        const selectEdition=(index,focusTab=false)=>{
+          const buttons=[...tabs.querySelectorAll('[role="tab"]')];
+          buttons.forEach((button,i)=>{
+            button.setAttribute('aria-selected',String(i===index));
+            button.tabIndex=i===index?0:-1;
+          });
+          body.innerHTML=rec.editions[index].bodyHtml;
+          body.setAttribute('role','tabpanel');
+          body.setAttribute('aria-labelledby',buttons[index].id);
+          body.tabIndex=0;
+          if(focusTab) buttons[index].focus();
+        };
+        rec.editions.forEach((edition,index)=>{
+          const button=document.createElement('button');
+          button.type='button'; button.className='letter-tab';
+          button.id=`letter-tab-${edition.year}`;
+          button.setAttribute('role','tab');
+          button.setAttribute('aria-controls','letter-body');
+          button.textContent=edition.label;
+          button.addEventListener('click',()=>selectEdition(index));
+          button.addEventListener('keydown',e=>{
+            let next=index;
+            if(e.key==='ArrowRight') next=(index+1)%rec.editions.length;
+            else if(e.key==='ArrowLeft') next=(index-1+rec.editions.length)%rec.editions.length;
+            else if(e.key==='Home') next=0;
+            else if(e.key==='End') next=rec.editions.length-1;
+            else return;
+            e.preventDefault(); selectEdition(next,true);
+          });
+          tabs.appendChild(button);
+        });
+        const defaultIndex=rec.editions.findIndex(edition=>edition.year===rec.defaultYear);
+        selectEdition(defaultIndex<0?rec.editions.length-1:defaultIndex);
+      }else{
+        body.innerHTML=rec.bodyHtml||'';
+      }
       const sec=document.getElementById('secret');
       sec.hidden=false; sec.setAttribute('aria-hidden','false');
+      sec.querySelector('.letter').scrollTop=0;
       setTimeout(()=>{ document.getElementById('close-letter').focus(); },50);
     }
 
@@ -1006,6 +1173,20 @@
         <p style="text-align:right;">Atte. E</p>
       `
     };
+
+    // La carta original se conserva íntegra en la pestaña de 2025.
+    SECRET_BOOK[HASH_2109].defaultYear='2026';
+    SECRET_BOOK[HASH_2109].editions=[
+      {year:'2025',label:'21 sep 2025',bodyHtml:SECRET_BOOK[HASH_2109].bodyHtml},
+      {year:'2026',label:'21 sep 2026',bodyHtml:`
+        <p>Un nuevo año, nuevos aprendizajes y tantas cosas por vivir.</p>
+        <p>Hoy se cumple un año de las primeras flores y de tantas primeras veces. Y ya casi, un año de ser más que amigos.</p>
+        <p>Es curioso pensar que nada de esto estaba planeado, que hace unos años no formaba parte de lo que imaginábamos como nuestra vida ideal. Durante este tiempo también vivimos cosas que quizá no habríamos elegido. Pero, al final, lo más importante para mí es poder compartir la vida contigo.</p>
+        <p>Para mí, las flores amarillas representan el comienzo de algo nuevo. Hace un año fue así, y quiero que este año también lo sea: otra oportunidad para seguir aprendiendo, creciendo y viviendo cosas juntos. Habrá experiencias que compartamos y otras que nos toque vivir por separado, pero siempre estaré para apoyarte, acompañarte y celebrar tus logros.</p>
+        <p>Te amo mucho, y eso no cambiará.</p>
+        <p style="text-align:right;font-style:italic;">TQM, E.</p>
+      `}
+    ];
 
     function startPetals(){
       for(let i=0;i<28;i++){
@@ -1472,6 +1653,55 @@
     }
     document.getElementById('close-letter').addEventListener('click', closeLetter);
 
+
+    /* Ramo vectorial: cada flor tiene dos coronas de pétalos, semillas y hojas. */
+    let yellowBouquetActive = store.get('yellowBouquetActive', false);
+    function yellowBouquetSVG(){
+      const flowers=[
+        [188,230,.75,-19],[414,226,.78,20],[242,162,.83,-9],
+        [359,146,.76,12],[304,248,.94,-5],[150,330,.75,-24],
+        [451,328,.72,26],[226,354,.92,-12],[377,341,1.02,14]
+      ];
+      let stems='', heads='';
+      flowers.forEach(([x,y,z,tilt],i)=>{
+        const wind=`--root-x:${296+(i-4)*3}px;--wind-time:${(4.8+i*.27).toFixed(2)}s;--wind-delay:-${(i*.73).toFixed(2)}s;--wind-angle:${(2.2+(i%4)*.35).toFixed(2)}deg`;
+        stems+=`<g class="yg-plant" style="${wind}">`;
+        stems+=`<path d="M ${296+(i-4)*3} 608 Q ${x+30} 432 ${x} ${y}" fill="none" stroke="url(#ygStem)" stroke-width="${5*z}" stroke-linecap="round"/>`;
+        const ly=y+(600-y)*.46, lx=x+(300-x)*.3;
+        stems+=`<g transform="translate(${lx} ${ly}) rotate(${tilt})"><g class="yg-leaf"><path d="M0 0 Q-69 -6 -78 -64 Q-12 -67 0 0" fill="url(#ygLeaf)"/><path d="M0 0 Q-37 -24 -69 -56" fill="none" stroke="#c3c885" stroke-width="1"/><path d="M4 35 Q70 16 73 -28 Q17 -24 4 35" fill="url(#ygLeaf)"/><path d="M4 35 L65 -21" stroke="#c3c885" fill="none" stroke-width="1"/></g></g></g>`;
+        let petals='';
+        for(let layer=0;layer<2;layer++){
+          petals+=`<g class="yg-petal-ring${layer?' yg-petal-ring--inner':''}">`;
+          const n=layer?17:21;
+          for(let j=0;j<n;j++){
+            const a=360*j/n+(layer?9:0), len=(layer?57:76)+(j%3)*3;
+            petals+=`<g transform="rotate(${a})"><path d="M-5 -14 C-22 -34 -19 -${len-7} 0 -${len} C18 -${len-9} 21 -35 5 -14Z" fill="url(#ygPetal${layer})" stroke="#c6921b" stroke-opacity=".23" stroke-width=".6"/><path d="M0 -23 Q-3 -43 0 -${len-9}" fill="none" stroke="#fff5b2" stroke-opacity=".55" stroke-width="1"/></g>`;
+          }
+          petals+='</g>';
+        }
+        let seeds='';
+        for(let j=0;j<110;j++){
+          const a=j*2.39996, r=21*Math.sqrt(j/110);
+          seeds+=`<circle cx="${(Math.cos(a)*r).toFixed(2)}" cy="${(Math.sin(a)*r).toFixed(2)}" r="${j%3===0?1.25:.85}" fill="${j%3===0?'#d4a34e':'#8d5824'}"/>`;
+        }
+        heads+=`<g class="yg-plant" style="${wind}"><g class="yg-grow" style="--delay:${i*.085}s"><g transform="translate(${x} ${y}) rotate(${tilt}) scale(${z})"><g class="yg-flower">${petals}<circle r="25" fill="url(#ygCore)" stroke="#ce9b2f" stroke-width="3"/>${seeds}<ellipse cx="-7" cy="-9" rx="10" ry="5" fill="#f1c66d" opacity=".12"/></g></g></g></g>`;
+      });
+      return `<svg class="yg-art" viewBox="0 0 600 650" role="img" aria-label="Un ramo de nueve girasoles amarillos con pétalos dorados, centros con semillas y hojas verdes"><defs>
+      <linearGradient id="ygPetal0" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#fff4a1"/><stop offset=".42" stop-color="#f8d547"/><stop offset="1" stop-color="#dca014"/></linearGradient>
+      <linearGradient id="ygPetal1" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff4a1"/><stop offset=".45" stop-color="#ffdf57"/><stop offset="1" stop-color="#e9af1e"/></linearGradient>
+      <radialGradient id="ygCore"><stop stop-color="#725031"/><stop offset=".75" stop-color="#56371e"/><stop offset="1" stop-color="#97632b"/></radialGradient>
+      <linearGradient id="ygStem"><stop stop-color="#81965a"/><stop offset=".5" stop-color="#4f733d"/><stop offset="1" stop-color="#304b2c"/></linearGradient>
+      <linearGradient id="ygLeaf" x2="1" y2="1"><stop stop-color="#9cab64"/><stop offset=".55" stop-color="#64814b"/><stop offset="1" stop-color="#365c36"/></linearGradient>
+      </defs><ellipse cx="305" cy="616" rx="105" ry="12" fill="#667043" opacity=".09"/>${stems}${heads}<g transform="translate(300 555)"><path d="M0 0 C-75 -50 -78 23 -5 7 C70 -43 74 31 5 8" fill="none" stroke="#bf944a" stroke-width="7"/><path d="M-3 5 Q-22 34 -35 51 M4 6 Q23 30 39 42" fill="none" stroke="#cfa458" stroke-width="6"/><ellipse rx="9" ry="7" cy="5" fill="#ae8038"/></g></svg>`;
+    }
+    function activateYellowBouquet(){
+      yellowBouquetActive=true;
+      store.set('yellowBouquetActive',true);
+      renderBouquet();
+      bouquet.classList.add('is-visible');
+      bouquet.setAttribute('aria-hidden','false');
+    }
+
     /* ===================== INICIO ===================== */
     setMood(mood || 'feliz');
     fitLayout();
@@ -1491,11 +1721,14 @@
         return;
       }
 
-      __origShowSecret(hash);
-
       if(hash === HASH_2109){
+        activateYellowBouquet();
+        __origShowSecret(hash);
+        stopPetals();
         startPetals();
+        return;
       }
+      __origShowSecret(hash);
     };
   </script>
 </body>
